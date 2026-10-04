@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CaffetteriaRouteImport } from './routes/caffetteria'
+import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as DrinkRouteImport } from './routes/drink'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as ViniRouteImport } from './routes/vini'
@@ -20,9 +22,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CaffetteriaRoute = CaffetteriaRouteImport.update({
   id: '/caffetteria',
   path: '/caffetteria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContattiRoute = ContattiRouteImport.update({
+  id: '/contatti',
+  path: '/contatti',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DrinkRoute = DrinkRouteImport.update({
@@ -43,14 +55,18 @@ const ViniRoute = ViniRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/caffetteria': typeof CaffetteriaRoute
+  '/contatti': typeof ContattiRoute
   '/drink': typeof DrinkRoute
   '/menu': typeof MenuRoute
   '/vini': typeof ViniRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/caffetteria': typeof CaffetteriaRoute
+  '/contatti': typeof ContattiRoute
   '/drink': typeof DrinkRoute
   '/menu': typeof MenuRoute
   '/vini': typeof ViniRoute
@@ -58,22 +74,36 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/caffetteria': typeof CaffetteriaRoute
+  '/contatti': typeof ContattiRoute
   '/drink': typeof DrinkRoute
   '/menu': typeof MenuRoute
   '/vini': typeof ViniRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/caffetteria' | '/drink' | '/menu' | '/vini'
+  fullPaths:
+    '/' | '/admin' | '/caffetteria' | '/contatti' | '/drink' | '/menu' | '/vini'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/caffetteria' | '/drink' | '/menu' | '/vini'
-  id: '__root__' | '/' | '/caffetteria' | '/drink' | '/menu' | '/vini'
+  to:
+    '/' | '/admin' | '/caffetteria' | '/contatti' | '/drink' | '/menu' | '/vini'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/caffetteria'
+    | '/contatti'
+    | '/drink'
+    | '/menu'
+    | '/vini'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   CaffetteriaRoute: typeof CaffetteriaRoute
+  ContattiRoute: typeof ContattiRoute
   DrinkRoute: typeof DrinkRoute
   MenuRoute: typeof MenuRoute
   ViniRoute: typeof ViniRoute
@@ -88,11 +118,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/caffetteria': {
       id: '/caffetteria'
       path: '/caffetteria'
       fullPath: '/caffetteria'
       preLoaderRoute: typeof CaffetteriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contatti': {
+      id: '/contatti'
+      path: '/contatti'
+      fullPath: '/contatti'
+      preLoaderRoute: typeof ContattiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/drink': {
@@ -121,7 +165,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   CaffetteriaRoute: CaffetteriaRoute,
+  ContattiRoute: ContattiRoute,
   DrinkRoute: DrinkRoute,
   MenuRoute: MenuRoute,
   ViniRoute: ViniRoute,
