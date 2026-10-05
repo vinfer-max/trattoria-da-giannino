@@ -16,6 +16,7 @@ import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as DrinkRouteImport } from './routes/drink'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as ViniRouteImport } from './routes/vini'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const ViniRoute = ViniRouteImport.update({
   path: '/vini',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/drink': typeof DrinkRoute
   '/menu': typeof MenuRoute
   '/vini': typeof ViniRoute
+  '/p/$slug': typeof PSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/drink': typeof DrinkRoute
   '/menu': typeof MenuRoute
   '/vini': typeof ViniRoute
+  '/p/$slug': typeof PSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,14 +88,29 @@ export interface FileRoutesById {
   '/drink': typeof DrinkRoute
   '/menu': typeof MenuRoute
   '/vini': typeof ViniRoute
+  '/p/$slug': typeof PSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/admin' | '/caffetteria' | '/contatti' | '/drink' | '/menu' | '/vini'
+    | '/'
+    | '/admin'
+    | '/caffetteria'
+    | '/contatti'
+    | '/drink'
+    | '/menu'
+    | '/vini'
+    | '/p/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/admin' | '/caffetteria' | '/contatti' | '/drink' | '/menu' | '/vini'
+    | '/'
+    | '/admin'
+    | '/caffetteria'
+    | '/contatti'
+    | '/drink'
+    | '/menu'
+    | '/vini'
+    | '/p/$slug'
   id:
     | '__root__'
     | '/'
@@ -97,6 +120,7 @@ export interface FileRouteTypes {
     | '/drink'
     | '/menu'
     | '/vini'
+    | '/p/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -107,6 +131,7 @@ export interface RootRouteChildren {
   DrinkRoute: typeof DrinkRoute
   MenuRoute: typeof MenuRoute
   ViniRoute: typeof ViniRoute
+  PSlugRoute: typeof PSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -160,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ViniRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -171,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   DrinkRoute: DrinkRoute,
   MenuRoute: MenuRoute,
   ViniRoute: ViniRoute,
+  PSlugRoute: PSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
