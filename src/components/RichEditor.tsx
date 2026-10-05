@@ -42,9 +42,9 @@ export default function RichEditor({ value, onChange }: { value: string; onChang
     selector: ({ editor: e }) =>
       e
         ? {
-            color: (e.getAttributes("textStyle").color as string) || "#e7e5e4",
-            font: (e.getAttributes("textStyle").fontFamily as string) || "",
-            size: (e.getAttributes("textStyle").fontSize as string) || "",
+            color: (e.getAttributes("textStyle")["color"] as string) || "#e7e5e4",
+            font: (e.getAttributes("textStyle")["fontFamily"] as string) || "",
+            size: (e.getAttributes("textStyle")["fontSize"] as string) || "",
           }
         : { color: "#e7e5e4", font: "", size: "" },
   });
@@ -88,7 +88,7 @@ export default function RichEditor({ value, onChange }: { value: string; onChang
         <button type="button" className={btn(editor.isActive({ textAlign: "right" }))} onClick={() => c().setTextAlign("right").run()}><AlignRight className="w-4 h-4" /></button>
         <button type="button" className={btn(editor.isActive({ textAlign: "justify" }))} onClick={() => c().setTextAlign("justify").run()}><AlignJustify className="w-4 h-4" /></button>
         <button type="button" className={btn(editor.isActive("link"))} onClick={() => {
-          const url = window.prompt("Indirizzo del link (vuoto per rimuovere)", editor.getAttributes("link").href || "https://");
+          const url = window.prompt("Indirizzo del link (vuoto per rimuovere)", editor.getAttributes("link")["href"] || "https://");
           if (url === null) return;
           if (!url) c().unsetLink().run(); else c().setLink({ href: url }).run();
         }}><Link2 className="w-4 h-4" /></button>
