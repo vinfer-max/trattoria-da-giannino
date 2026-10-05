@@ -1,36 +1,34 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
-export interface MenuCategory {
-  id: string;
-  name: string;
-  slug: string;
-  time_range: string | null;
-  cover_charge: number | null;
-  sort_order: number | null;
-  page: string;
-  created_at: string | null;
-}
-
-export interface MenuItem {
-  id: string;
-  category_id: string;
-  name: string;
-  description: string | null;
-  price: number;
-  is_featured: boolean | null;
-  sort_order: number | null;
-  created_at: string | null;
-}
+export type MenuCategory = Tables<"menu_categories">;
+export type MenuItem = Tables<"menu_items">;
 
 export interface CategoryWithItems extends MenuCategory {
   items: MenuItem[];
+  children: CategoryWithItems[];
 }
 
+export function buildTree(categories: MenuCategory[], items: MenuItem[]): CategoryWithItems[] {
+  const map = new Map<string, CategoryWithItems>();
+  categories.forEach((c) => map.set(c.id, { ...c, items: items.filter((i) => i.category_id === c.id), children: [] }));
+  const roots: CategoryWithItems[] = [];
+  categories.forEach((c) => {
+    const node = map.get(c.id)!;
+    const parent = c.parent_id ? map.get(c.parent_id) : undefined;
+    if (parent) parent.children.push(node);
+    else if (!c.parent_id) roots.push(node);
+  });
+  return roots;
+}
+
+/** Public: only visible categories/items for a page, as a tree. */
 export async function getMenuPage(page: string): Promise<CategoryWithItems[]> {
   const { data: categories, error: catError } = await supabase
     .from("menu_categories")
     .select("*")
     .eq("page", page)
+    .eq("is_visible", true)
     .order("sort_order");
   if (catError) throw catError;
   if (!categories || categories.length === 0) return [];
@@ -38,15 +36,10 @@ export async function getMenuPage(page: string): Promise<CategoryWithItems[]> {
   const { data: items, error: itemsError } = await supabase
     .from("menu_items")
     .select("*")
-    .in(
-      "category_id",
-      categories.map((c) => c.id),
-    )
+    .eq("is_visible", true)
+    .in("category_id", categories.map((c) => c.id))
     .order("sort_order");
   if (itemsError) throw itemsError;
 
-  return categories.map((cat) => ({
-    ...cat,
-    items: (items || []).filter((item) => item.category_id === cat.id),
-  }));
+  return buildTree(categories, items ?? []);
 }

@@ -14,13 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
+      events: {
+        Row: {
+          created_at: string | null
+          description: string
+          event_date: string | null
+          id: string
+          image_url: string | null
+          is_visible: boolean
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string
+          event_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_visible?: boolean
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          event_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_visible?: boolean
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      home_sections: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_visible: boolean
+          sort_order: number
+          title: string | null
+        }
+        Insert: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_visible?: boolean
+          sort_order?: number
+          title?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_visible?: boolean
+          sort_order?: number
+          title?: string | null
+        }
+        Relationships: []
+      }
+      home_slides: {
+        Row: {
+          alt: string | null
+          created_at: string | null
+          id: string
+          image_url: string
+          is_visible: boolean
+          sort_order: number
+        }
+        Insert: {
+          alt?: string | null
+          created_at?: string | null
+          id?: string
+          image_url: string
+          is_visible?: boolean
+          sort_order?: number
+        }
+        Update: {
+          alt?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          is_visible?: boolean
+          sort_order?: number
+        }
+        Relationships: []
+      }
       menu_categories: {
         Row: {
           cover_charge: number | null
           created_at: string | null
           id: string
+          is_visible: boolean
           name: string
           page: string
+          parent_id: string | null
           slug: string
           sort_order: number | null
           time_range: string | null
@@ -29,8 +118,10 @@ export type Database = {
           cover_charge?: number | null
           created_at?: string | null
           id?: string
+          is_visible?: boolean
           name: string
           page?: string
+          parent_id?: string | null
           slug: string
           sort_order?: number | null
           time_range?: string | null
@@ -39,13 +130,23 @@ export type Database = {
           cover_charge?: number | null
           created_at?: string | null
           id?: string
+          is_visible?: boolean
           name?: string
           page?: string
+          parent_id?: string | null
           slug?: string
           sort_order?: number | null
           time_range?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "menu_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "menu_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       menu_items: {
         Row: {
@@ -53,7 +154,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          image_url: string | null
           is_featured: boolean | null
+          is_visible: boolean
           name: string
           price: number
           sort_order: number | null
@@ -63,7 +166,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          image_url?: string | null
           is_featured?: boolean | null
+          is_visible?: boolean
           name: string
           price?: number
           sort_order?: number | null
@@ -73,7 +178,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          image_url?: string | null
           is_featured?: boolean | null
+          is_visible?: boolean
           name?: string
           price?: number
           sort_order?: number | null
@@ -87,6 +194,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_pages: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_system: boolean
+          is_visible: boolean
+          slug: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_system?: boolean
+          is_visible?: boolean
+          slug: string
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_system?: boolean
+          is_visible?: boolean
+          slug?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+        }
+        Relationships: []
       }
       site_settings: {
         Row: {
