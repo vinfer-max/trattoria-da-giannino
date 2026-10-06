@@ -26,8 +26,8 @@ function Home() {
   const { data } = useQuery({ queryKey: ["home"], queryFn: getHomeData });
   const s = data?.settings ?? {};
   const images = data && data.slides.length ? data.slides.map((x) => x.image_url) : [fallbackHero];
-  const carousel = s.home_carousel_enabled === "true" && images.length > 1;
-  const interval = Math.max(2, Number(s.home_carousel_interval) || 5) * 1000;
+  const carousel = s['home_carousel_enabled'] === "true" && images.length > 1;
+  const interval = Math.max(2, Number(s['home_carousel_interval']) || 5) * 1000;
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
@@ -47,16 +47,16 @@ function Home() {
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto animate-fade-in-up">
           <span className="inline-block mb-6 text-xs sm:text-sm tracking-[0.3em] uppercase text-amber-500/80 font-medium">
-            {s.home_eyebrow ?? "Est. 1974"}
+            {s['home_eyebrow'] ?? "Est. 1974"}
           </span>
-          {s.home_title ? (
-            <RichText html={s.home_title} className="text-4xl sm:text-6xl md:text-7xl font-serif text-stone-50 leading-[1.1] mb-6" />
+          {s['home_title'] ? (
+            <RichText html={s['home_title']} className="text-4xl sm:text-6xl md:text-7xl font-serif text-stone-50 leading-[1.1] mb-6" />
           ) : (
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif text-stone-50 leading-[1.1] mb-6">
               Stesse radici,<br /><em className="text-amber-400">nuovo orizzonte.</em>
             </h1>
           )}
-          <RichText html={s.home_subtitle ?? "Accanto alla tradizione, nasce un nuovo gusto."} className="text-lg sm:text-xl text-stone-300 font-light max-w-2xl mx-auto mb-10" />
+          <RichText html={s['home_subtitle'] ?? "Accanto alla tradizione, nasce un nuovo gusto."} className="text-lg sm:text-xl text-stone-300 font-light max-w-2xl mx-auto mb-10" />
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/menu" className="inline-flex items-center justify-center px-8 py-3.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-sm tracking-wide rounded-lg">
               Scopri il Menù

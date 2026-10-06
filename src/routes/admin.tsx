@@ -35,14 +35,14 @@ async function move(table: string, list: Sortable[], idx: number, dir: -1 | 1) {
   const j = idx + dir;
   if (j < 0 || j >= list.length) return;
   const arr = [...list];
-  [arr[idx], arr[j]] = [arr[j], arr[idx]];
+  const tmp = arr[idx]!; arr[idx] = arr[j]!; arr[j] = tmp;
   await Promise.all(arr.map((r, i) => db(table).update({ sort_order: i + 1 }).eq("id", r.id)));
 }
 
 function Controls({ table, list, idx, visible, onDone, onDelete }: {
-  table: string; list: Sortable[]; idx: number; visible: boolean; onDone: () => void; onDelete?: () => void;
+  table: string; list: Sortable[]; idx: number; visible: boolean; onDone: () => void; onDelete?: (() => void) | undefined;
 }) {
-  const row = list[idx];
+  const row = list[idx]!;
   return (
     <div className="flex items-center gap-0.5 shrink-0">
       <button className={btn} title="Su" disabled={idx === 0} onClick={() => move(table, list, idx, -1).then(onDone)}><ArrowUp className="w-4 h-4" /></button>
@@ -361,14 +361,14 @@ function HomeTab() {
     <div className="space-y-6">
       <Section title="Testata">
         <label className="block text-xs text-stone-400">Scritta piccola in alto
-          <input className={`${inputCls} w-full mt-1`} value={settings.home_eyebrow ?? ""} onChange={(e) => set("home_eyebrow", e.target.value)} />
+          <input className={`${inputCls} w-full mt-1`} value={settings['home_eyebrow'] ?? ""} onChange={(e) => set("home_eyebrow", e.target.value)} />
         </label>
-        <div className="text-xs text-stone-400">Titolo<RichEditor value={settings.home_title ?? ""} onChange={(v) => set("home_title", v)} /></div>
-        <div className="text-xs text-stone-400">Sottotitolo<RichEditor value={settings.home_subtitle ?? ""} onChange={(v) => set("home_subtitle", v)} /></div>
+        <div className="text-xs text-stone-400">Titolo<RichEditor value={settings['home_title'] ?? ""} onChange={(v) => set("home_title", v)} /></div>
+        <div className="text-xs text-stone-400">Sottotitolo<RichEditor value={settings['home_subtitle'] ?? ""} onChange={(v) => set("home_subtitle", v)} /></div>
         <div className="flex flex-wrap gap-4 items-center text-sm text-stone-300">
-          <label className="flex items-center gap-2"><input type="checkbox" checked={settings.home_carousel_enabled === "true"} onChange={(e) => set("home_carousel_enabled", String(e.target.checked))} /> Carosello immagini attivo</label>
+          <label className="flex items-center gap-2"><input type="checkbox" checked={settings['home_carousel_enabled'] === "true"} onChange={(e) => set("home_carousel_enabled", String(e.target.checked))} /> Carosello immagini attivo</label>
           <label className="flex items-center gap-2">Secondi per immagine
-            <input type="number" min={2} className={`${inputCls} w-20`} value={settings.home_carousel_interval ?? "5"} onChange={(e) => set("home_carousel_interval", e.target.value)} />
+            <input type="number" min={2} className={`${inputCls} w-20`} value={settings['home_carousel_interval'] ?? "5"} onChange={(e) => set("home_carousel_interval", e.target.value)} />
           </label>
         </div>
         <button onClick={saveTexts} className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-stone-950 font-semibold rounded-lg"><Save className="w-4 h-4" /> {saved ? "Salvato!" : "Salva testata"}</button>
