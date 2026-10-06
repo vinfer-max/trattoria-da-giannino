@@ -1,23 +1,38 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getVisiblePages } from "@/lib/cms";
 import logoAsset from "@/assets/logo-giannino.png.asset.json";
 
 const logo = logoAsset.url;
 
-const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/menu", label: "Menù" },
-  { to: "/caffetteria", label: "Caffetteria" },
-  { to: "/drink", label: "Drink List" },
-  { to: "/vini", label: "Carta dei Vini" },
-  { to: "/contatti", label: "Contatti" },
-] as const;
+const SYSTEM = ["menu", "caffetteria", "drink", "vini"] as const;
+const defaultPages = [
+  { slug: "menu", title: "Menù" },
+  { slug: "caffetteria", title: "Caffetteria" },
+  { slug: "drink", title: "Drink List" },
+  { slug: "vini", title: "Carta dei Vini" },
+];
+
+function NavLink({ to, className, children }: { to: string; className: string; children: ReactNode }) {
+  if (to.startsWith("/p/")) return <Link to="/p/$slug" params={{ slug: to.slice(3) }} className={className}>{children}</Link>;
+  return <Link to={to as "/"} className={className}>{children}</Link>;
+}
 
 export default function Layout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = useLocation({ select: (l) => l.pathname });
+  const { data: pages } = useQuery({ queryKey: ["pages"], queryFn: getVisiblePages });
+  const navLinks = [
+    { to: "/", label: "Home" },
+    ...(pages ?? defaultPages).map((p) => ({
+      to: (SYSTEM as readonly string[]).includes(p.slug) ? `/${p.slug}` : `/p/${p.slug}`,
+      label: p.title,
+    })),
+    { to: "/contatti", label: "Contatti" },
+  ];
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -63,7 +78,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
             <nav className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
-                <Link
+                <NavLink
                   key={link.to}
                   to={link.to}
                   className={`px-3 py-2 text-sm tracking-wide transition-colors rounded-md ${
@@ -73,7 +88,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                   }`}
                 >
                   {link.label}
-                </Link>
+                </NavLink>
               ))}
             </nav>
 
@@ -112,7 +127,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             </div>
             <nav className="flex flex-col gap-1">
               {navLinks.map((link) => (
-                <Link
+                <NavLink
                   key={link.to}
                   to={link.to}
                   className={`px-4 py-3 text-base tracking-wide rounded-lg transition-colors ${
@@ -122,7 +137,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                   }`}
                 >
                   {link.label}
-                </Link>
+                </NavLink>
               ))}
             </nav>
           </div>
@@ -139,9 +154,9 @@ export default function Layout({ children }: { children: ReactNode }) {
             <p className="text-sm text-stone-500 mb-6">Stesse radici, nuovo orizzonte.</p>
             <div className="flex flex-wrap gap-4 justify-center mb-6">
               {navLinks.map((link) => (
-                <Link key={link.to} to={link.to} className="text-sm text-stone-400 hover:text-amber-400 transition-colors">
+                <NavLink key={link.to} to={link.to} className="text-sm text-stone-400 hover:text-amber-400 transition-colors">
                   {link.label}
-                </Link>
+                </NavLink>
               ))}
             </div>
             <div className="text-xs text-stone-600">
