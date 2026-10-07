@@ -3,8 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getSettings } from "@/lib/cms";
 import RichText from "@/components/RichText";
 import { MapPin, Phone, Mail, Instagram, Clock } from "lucide-react";
-
-const MAPS = "https://maps.google.com/?q=Via+Nazionale+34+98077+Santo+Stefano+di+Camastra+ME";
+import { CONTACTS_KEY, mapsLink, parseContacts } from "@/lib/contacts";
 
 export const Route = createFileRoute("/contatti")({
   head: () => ({
@@ -13,6 +12,8 @@ export const Route = createFileRoute("/contatti")({
       { name: "description", content: "Via Nazionale 34, Santo Stefano di Camastra (ME). Tel. 0921 995719." },
       { property: "og:title", content: "Contatti — Giannino Bistrot Cafè" },
       { property: "og:description", content: "Vieni a trovarci a Santo Stefano di Camastra." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Contatti,
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/contatti")({
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="p-6 rounded-xl bg-stone-900/50 border border-stone-800/60">
+    <div className="p-6 rounded-lg bg-stone-900/50 border border-stone-800/60 min-w-0 break-words">
       <h3 className="text-lg font-serif text-amber-400 mb-4">{title}</h3>
       {children}
     </div>
@@ -30,6 +31,11 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 function Contatti() {
   const { data: settings } = useQuery({ queryKey: ["settings"], queryFn: getSettings });
   const intro = settings?.["contatti_content"];
+  const contacts = parseContacts(settings?.[CONTACTS_KEY]);
+  const maps = mapsLink(contacts.mapAddress);
+  const browserKey = import.meta.env['VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY'];
+  const mapUrl = browserKey ? `https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(browserKey)}&q=${encodeURIComponent(contacts.mapAddress)}&language=it` : null;
+  const instagram = contacts.instagram.replace(/^@/, "").trim();
   return (
     <div className="pt-20 sm:pt-24">
       <section className="relative py-16 sm:py-24 overflow-hidden">
@@ -43,60 +49,57 @@ function Contatti() {
 
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {intro && <RichText html={intro} className="mb-10 text-stone-300" />}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className={`grid grid-cols-1 ${contacts.mapVisible ? "md:grid-cols-2" : ""} gap-8`}>
           <div className="space-y-6">
-            <Card title="Dove siamo">
-              <a href={MAPS} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 text-stone-300 hover:text-amber-400 transition-colors group">
+            {contacts.addressVisible && <Card title="Dove siamo">
+              <a href={maps} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 text-stone-300 hover:text-amber-400 transition-colors group">
                 <MapPin className="w-5 h-5 mt-0.5 text-amber-500 shrink-0" />
-                <span className="group-hover:underline">
-                  Via Nazionale, 34<br />98077 Santo Stefano di Camastra (ME)
-                </span>
+                <RichText html={contacts.address} className="min-w-0 group-hover:underline" />
               </a>
-            </Card>
-            <Card title="Telefono">
-              <a href="tel:0921995719" className="flex items-center gap-3 text-stone-300 hover:text-amber-400 transition-colors">
+            </Card>}
+            {contacts.phoneVisible && <Card title="Telefono">
+              <a href={`tel:${contacts.phone.replace(/[^+\d]/g, "")}`} className="flex items-center gap-3 text-stone-300 hover:text-amber-400 transition-colors">
                 <Phone className="w-5 h-5 text-amber-500 shrink-0" />
-                0921 995719
+                {contacts.phone}
               </a>
-            </Card>
-            <Card title="Email">
-              <a href="mailto:gianninobistrotcafe@gmail.com" className="flex items-center gap-3 text-stone-300 hover:text-amber-400 transition-colors">
+            </Card>}
+            {contacts.emailVisible && <Card title="Email">
+              <a href={`mailto:${contacts.email}`} className="flex items-start gap-3 text-stone-300 hover:text-amber-400 transition-colors">
                 <Mail className="w-5 h-5 text-amber-500 shrink-0" />
-                gianninobistrotcafe@gmail.com
+                <span className="min-w-0 break-all">{contacts.email}</span>
               </a>
-            </Card>
-            <Card title="Instagram">
-              <a href="https://instagram.com/giannino.bistrot" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-stone-300 hover:text-amber-400 transition-colors">
+            </Card>}
+            {contacts.instagramVisible && <Card title="Instagram">
+              <a href={`https://www.instagram.com/${encodeURIComponent(instagram)}/`} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 text-stone-300 hover:text-amber-400 transition-colors">
                 <Instagram className="w-5 h-5 text-amber-500 shrink-0" />
-                @giannino.bistrot
+                <span className="min-w-0 break-all">@{instagram}</span>
               </a>
-            </Card>
-            <Card title="Orari">
+            </Card>}
+            {contacts.hoursVisible && <Card title="Orari">
               <div className="flex items-start gap-3 text-stone-300">
                 <Clock className="w-5 h-5 mt-0.5 text-amber-500 shrink-0" />
-                <div>
-                  <p>Lunedì – Domenica</p>
-                  <p className="text-stone-400 text-sm mt-1">Giovedì chiuso</p>
-                </div>
+                 <RichText html={contacts.hours} className="min-w-0" />
               </div>
-            </Card>
+            </Card>}
           </div>
 
-          <div className="rounded-xl overflow-hidden border border-stone-800/60 h-[400px] md:h-auto bg-stone-900">
-            <iframe
+          {contacts.mapVisible && <div className="rounded-lg overflow-hidden border border-site-border bg-site-panel flex flex-col min-w-0">
+            {mapUrl ? <iframe
               title="Mappa Giannino Bistrot Cafè"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=14.5250%2C38.0100%2C14.5410%2C38.0235&layer=mapnik&marker=38.0167%2C14.5333"
+              src={mapUrl}
               width="100%"
               height="100%"
-              style={{ border: 0, minHeight: "400px" }}
+              className="border-0 min-h-[400px] flex-1"
               loading="lazy"
-            />
+              allowFullScreen
+              referrerPolicy="strict-origin-when-cross-origin"
+            /> : <div className="min-h-[400px] flex flex-col items-center justify-center gap-3 p-6 text-site-muted"><MapPin /><p>Google Maps non ancora collegato.</p></div>}
             <div className="bg-stone-900 px-4 py-3 text-right">
-              <a href={MAPS} target="_blank" rel="noopener noreferrer" className="text-sm text-amber-400 hover:text-amber-300 transition-colors">
+              <a href={maps} target="_blank" rel="noopener noreferrer" className="text-sm text-amber-400 hover:text-amber-300 transition-colors">
                 Apri il percorso su Google Maps
               </a>
             </div>
-          </div>
+          </div>}
         </div>
       </section>
     </div>
