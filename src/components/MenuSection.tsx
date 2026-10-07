@@ -1,3 +1,4 @@
+import RichText from "./RichText";
 import type { CategoryWithItems } from "@/lib/menu";
 
 function formatPrice(price: number): string {
@@ -29,6 +30,8 @@ function Category({ category, depth }: { category: CategoryWithItems; depth: num
         </h2>
         {category.time_range && <span className="text-sm text-stone-400 tracking-wide">{category.time_range}</span>}
       </div>
+
+      {category.description && <RichText html={category.description} className="text-stone-300 mb-4" />}
 
       {cover > 0 && (
         <p className="text-sm text-stone-400 mb-4 italic">Coperto: €{cover.toFixed(2).replace(".00", "")}</p>
@@ -64,7 +67,7 @@ function Category({ category, depth }: { category: CategoryWithItems; depth: num
                     {item.name}
                   </span>
                   {item.description && (
-                    <p className={`text-sm mt-0.5 ${isWine ? "text-stone-500 italic" : "text-stone-400"}`}>{item.description}</p>
+                    <RichText html={item.description} className={`text-sm mt-0.5 ${isWine ? "text-stone-500 italic" : "text-stone-400"}`} />
                   )}
                 </div>
                 {price > 0 && (

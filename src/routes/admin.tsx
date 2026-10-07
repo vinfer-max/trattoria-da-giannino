@@ -7,6 +7,28 @@ import { supabase } from "@/integrations/supabase/client";
 import type { MenuCategory, MenuItem } from "@/lib/menu";
 import { getSettings, saveSetting, slugify, uploadImage, type SitePage, type HomeSlide, type HomeSection, type SiteEvent } from "@/lib/cms";
 import RichEditor from "@/components/RichEditor";
+import RichText from "@/components/RichText";
+
+function DescEditor({ value, onSave, label = "descrizione" }: { value: string; onSave: (v: string) => void; label?: string }) {
+  const [open, setOpen] = useState(false);
+  const [v, setV] = useState(value);
+  useEffect(() => setV(value), [value]);
+  if (!open) return (
+    <div className="space-y-1">
+      {value && <RichText html={value} className="text-sm text-stone-400" />}
+      <button className={addBtn} onClick={() => setOpen(true)}>Modifica {label}</button>
+    </div>
+  );
+  return (
+    <div className="space-y-2">
+      <RichEditor value={v} onChange={setV} />
+      <div className="flex gap-2">
+        <button className={addBtn} onClick={() => { onSave(v); setOpen(false); }}><Save className="w-3.5 h-3.5" /> Salva</button>
+        <button className="text-xs text-stone-400" onClick={() => { setV(value); setOpen(false); }}>Annulla</button>
+      </div>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -145,7 +167,7 @@ function LoginForm() {
   );
 }
 
-const TABS = ["Pagine", "Categorie e Prodotti", "Home", "Eventi"] as const;
+const TABS = ["Pagine", "Categorie e Prodotti", "Home", "Eventi", "Contatti"] as const;
 
 function AdminPanel() {
   const [tab, setTab] = useState<(typeof TABS)[number]>("Pagine");
@@ -170,6 +192,7 @@ function AdminPanel() {
       {tab === "Categorie e Prodotti" && <CatalogTab />}
       {tab === "Home" && <HomeTab />}
       {tab === "Eventi" && <EventsTab />}
+      {tab === "Contatti" && <ContactsTab />}
     </>
   );
 }
@@ -301,6 +324,7 @@ function CatCard({ cat, idx, list, depth, ...p }: { cat: MenuCategory; idx: numb
       </div>
       {open && (
         <div className="p-3 space-y-3">
+          <DescEditor label="testo categoria" value={cat.description ?? ""} onSave={(v) => upd({ description: v })} />
           {catItems.map((it, i) => <ItemRow key={it.id} item={it} idx={i} list={catItems} cats={p.allCats} reload={p.reloadItems} />)}
           {catItems.length === 0 && <p className="text-sm text-stone-500 italic">Nessun prodotto</p>}
           <div className="flex flex-wrap gap-2">
@@ -324,7 +348,7 @@ function ItemRow({ item, idx, list, cats, reload }: { item: MenuItem; idx: numbe
         <Controls table="menu_items" list={list} idx={idx} visible={item.is_visible} onDone={reload}
           onDelete={() => supabase.from("menu_items").delete().eq("id", item.id).then(reload)} />
       </div>
-      <Field className="w-full" placeholder="Descrizione" value={item.description ?? ""} onSave={(v) => upd({ description: v })} />
+      <DescEditor value={item.description ?? ""} onSave={(v) => upd({ description: v })} />
       <div className="flex flex-wrap gap-3 items-center text-xs text-stone-400">
         <label className="flex items-center gap-1"><input type="checkbox" checked={!!item.is_featured} onChange={(e) => upd({ is_featured: e.target.checked })} /> In evidenza</label>
         <label className="flex items-center gap-1">Sposta in:
@@ -438,5 +462,21 @@ function EventEditor({ e, idx, list, reload }: { e: SiteEvent; idx: number; list
         <button className={addBtn} onClick={() => db("events").update({ ...f, event_date: f.event_date || null }).eq("id", e.id).then(reload)}><Save className="w-3.5 h-3.5" /> Salva evento</button>
       </div>
     </div>
+  );
+}
+
+/* ---------------- Contatti ---------------- */
+function ContactsTab() {
+  const [v, setV] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  useEffect(() => { getSettings().then((s) => setV(s["contatti_content"] ?? "")); }, []);
+  if (v === null) return <p className="text-stone-400">Caricamento…</p>;
+  return (
+    <Section title="Testo pagina Contatti">
+      <p className="text-xs text-stone-400">Questo testo appare in cima alla pagina Contatti (indirizzo, orari, avvisi…).</p>
+      <RichEditor value={v} onChange={setV} />
+      <button onClick={async () => { await saveSetting("contatti_content", v); setSaved(true); setTimeout(() => setSaved(false), 2000); }}
+        className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-stone-950 font-semibold rounded-lg"><Save className="w-4 h-4" /> {saved ? "Salvato!" : "Salva"}</button>
+    </Section>
   );
 }
