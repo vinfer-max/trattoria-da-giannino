@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Store contact details as one validated object in site_settings and share defaults between public and Admin views, so existing details remain editable without duplication.
+- Render the contact map through Google Maps Embed using the connector's public browser key and the saved address; no billable server lookup is needed.

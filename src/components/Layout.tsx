@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LockKeyhole } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { getVisiblePages } from "@/lib/cms";
 import logoAsset from "@/assets/logo-giannino.png.asset.json";
@@ -159,8 +160,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                 </NavLink>
               ))}
             </div>
-            <div className="text-xs text-stone-600">
-              &copy; {new Date().getFullYear()} Giannino Bistrot Cafè. Tutti i diritti riservati.
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-stone-600">
+              <span>&copy; {new Date().getFullYear()} Giannino Bistrot Cafè. Tutti i diritti riservati.</span>
+              <Button asChild variant="link" size="sm" className="h-auto px-0 py-1 text-xs text-site-muted hover:text-site-accent">
+                <Link to="/admin"><LockKeyhole className="size-3" aria-hidden="true" />Area Riservata</Link>
+              </Button>
             </div>
           </div>
         </div>

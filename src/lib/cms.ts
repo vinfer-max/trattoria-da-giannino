@@ -27,9 +27,12 @@ export async function getSettings(): Promise<Record<string, string>> {
 }
 
 export async function saveSetting(key: string, value: string) {
-  const { data } = await supabase.from("site_settings").select("id").eq("key", key).maybeSingle();
-  if (data) await supabase.from("site_settings").update({ value }).eq("id", data.id);
-  else await supabase.from("site_settings").insert({ key, value });
+  const { data, error } = await supabase.from("site_settings").select("id").eq("key", key).maybeSingle();
+  if (error) throw error;
+  const result = data
+    ? await supabase.from("site_settings").update({ value }).eq("id", data.id)
+    : await supabase.from("site_settings").insert({ key, value });
+  if (result.error) throw result.error;
 }
 
 export interface HomeData {

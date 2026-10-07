@@ -19,6 +19,12 @@
  */
 
 @theme inline {
+  --color-site-bg: oklch(0.147 0.004 49.25);
+  --color-site-panel: oklch(0.268 0.007 34.298);
+  --color-site-text: oklch(0.97 0.001 106.424);
+  --color-site-muted: oklch(0.709 0.01 56.259);
+  --color-site-accent: oklch(0.828 0.189 84.429);
+  --color-site-border: oklch(0.374 0.01 67.558);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

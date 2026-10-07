@@ -8,6 +8,7 @@ import type { MenuCategory, MenuItem } from "@/lib/menu";
 import { getSettings, saveSetting, slugify, uploadImage, type SitePage, type HomeSlide, type HomeSection, type SiteEvent } from "@/lib/cms";
 import RichEditor from "@/components/RichEditor";
 import RichText from "@/components/RichText";
+import ContactsAdmin from "@/components/ContactsAdmin";
 
 function DescEditor({ value, onSave, label = "descrizione" }: { value: string; onSave: (v: string) => void; label?: string }) {
   const [open, setOpen] = useState(false);
@@ -192,7 +193,7 @@ function AdminPanel() {
       {tab === "Categorie e Prodotti" && <CatalogTab />}
       {tab === "Home" && <HomeTab />}
       {tab === "Eventi" && <EventsTab />}
-      {tab === "Contatti" && <ContactsTab />}
+      {tab === "Contatti" && <ContactsAdmin />}
     </>
   );
 }
@@ -465,18 +466,3 @@ function EventEditor({ e, idx, list, reload }: { e: SiteEvent; idx: number; list
   );
 }
 
-/* ---------------- Contatti ---------------- */
-function ContactsTab() {
-  const [v, setV] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
-  useEffect(() => { getSettings().then((s) => setV(s["contatti_content"] ?? "")); }, []);
-  if (v === null) return <p className="text-stone-400">Caricamento…</p>;
-  return (
-    <Section title="Testo pagina Contatti">
-      <p className="text-xs text-stone-400">Questo testo appare in cima alla pagina Contatti (indirizzo, orari, avvisi…).</p>
-      <RichEditor value={v} onChange={setV} />
-      <button onClick={async () => { await saveSetting("contatti_content", v); setSaved(true); setTimeout(() => setSaved(false), 2000); }}
-        className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-stone-950 font-semibold rounded-lg"><Save className="w-4 h-4" /> {saved ? "Salvato!" : "Salva"}</button>
-    </Section>
-  );
-}
