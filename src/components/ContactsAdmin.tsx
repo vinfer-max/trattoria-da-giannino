@@ -15,7 +15,7 @@ export default function ContactsAdmin() {
   useEffect(() => {
     getSettings().then((settings) => {
       setContacts(parseContacts(settings[CONTACTS_KEY]));
-      setIntro(settings.contatti_content ?? "");
+      setIntro(settings['contatti_content'] ?? "");
     }).catch(() => setMessage("Impossibile caricare i contatti. Riprova."));
   }, []);
 
