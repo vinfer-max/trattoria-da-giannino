@@ -10,14 +10,23 @@ import { useEffect } from "react";
 
 const FONTS = [
   { label: "Predefinito", value: "" },
-  { label: "Serif elegante", value: "Georgia, serif" },
-  { label: "Playfair", value: "'Playfair Display', serif" },
-  { label: "Cormorant", value: "'Cormorant Garamond', serif" },
-  { label: "Sans moderno", value: "Helvetica, Arial, sans-serif" },
+  { label: "Playfair Display", value: "'Playfair Display', serif" },
+  { label: "Cormorant Garamond", value: "'Cormorant Garamond', serif" },
+  { label: "Lora", value: "Lora, serif" },
+  { label: "Libre Baskerville", value: "'Libre Baskerville', serif" },
+  { label: "Cinzel", value: "Cinzel, serif" },
+  { label: "Georgia", value: "Georgia, serif" },
+  { label: "Inter", value: "Inter, sans-serif" },
   { label: "Montserrat", value: "Montserrat, sans-serif" },
-  { label: "Corsivo", value: "'Dancing Script', cursive" },
-  { label: "Macchina da scrivere", value: "'Courier New', monospace" },
+  { label: "Raleway", value: "Raleway, sans-serif" },
+  { label: "Josefin Sans", value: "'Josefin Sans', sans-serif" },
+  { label: "Oswald", value: "Oswald, sans-serif" },
+  { label: "Dancing Script", value: "'Dancing Script', cursive" },
+  { label: "Great Vibes", value: "'Great Vibes', cursive" },
+  { label: "Pacifico", value: "Pacifico, cursive" },
+  { label: "Courier", value: "'Courier New', monospace" },
 ];
+const PALETTE = ["#f5f5f4", "#a8a29e", "#57534e", "#0c0a09", "#fbbf24", "#f59e0b", "#b45309", "#78350f", "#dc2626", "#9f1239", "#16a34a", "#2563eb"];
 const SIZES = ["", "12px", "14px", "16px", "18px", "20px", "24px", "28px", "32px", "40px", "48px", "56px", "64px", "72px"];
 
 export default function RichEditor({ value, onChange }: { value: string; onChange: (html: string) => void }) {
@@ -72,6 +81,12 @@ export default function RichEditor({ value, onChange }: { value: string; onChang
         <label title="Evidenziatore" className="flex items-center gap-1 text-xs text-stone-400 px-1">
           ▇<input type="color" defaultValue="#78350f" onChange={(e) => c().setBackgroundColor(e.target.value).run()} className="w-6 h-6 bg-transparent" />
         </label>
+        <span className="flex gap-0.5">
+          {PALETTE.map((col) => (
+            <button key={col} type="button" title={col} onClick={() => c().setColor(col).run()}
+              className="w-4 h-4 rounded-sm border border-stone-600" style={{ background: col }} />
+          ))}
+        </span>
         <span className="w-px h-5 bg-stone-700 mx-1" />
         <button type="button" className={btn(editor.isActive("bold"))} onClick={() => c().toggleBold().run()}><Bold className="w-4 h-4" /></button>
         <button type="button" className={btn(editor.isActive("italic"))} onClick={() => c().toggleItalic().run()}><Italic className="w-4 h-4" /></button>

@@ -105,6 +105,7 @@ export type Database = {
         Row: {
           cover_charge: number | null
           created_at: string | null
+          description: string
           id: string
           is_visible: boolean
           name: string
@@ -117,6 +118,7 @@ export type Database = {
         Insert: {
           cover_charge?: number | null
           created_at?: string | null
+          description?: string
           id?: string
           is_visible?: boolean
           name: string
@@ -129,6 +131,7 @@ export type Database = {
         Update: {
           cover_charge?: number | null
           created_at?: string | null
+          description?: string
           id?: string
           is_visible?: boolean
           name?: string

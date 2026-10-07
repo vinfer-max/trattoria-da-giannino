@@ -1,4 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getSettings } from "@/lib/cms";
+import RichText from "@/components/RichText";
 import { MapPin, Phone, Mail, Instagram, Clock } from "lucide-react";
 
 const MAPS = "https://maps.google.com/?q=Via+Nazionale+34+98077+Santo+Stefano+di+Camastra+ME";
@@ -25,6 +28,8 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 }
 
 function Contatti() {
+  const { data: settings } = useQuery({ queryKey: ["settings"], queryFn: getSettings });
+  const intro = settings?.["contatti_content"];
   return (
     <div className="pt-20 sm:pt-24">
       <section className="relative py-16 sm:py-24 overflow-hidden">
@@ -37,6 +42,7 @@ function Contatti() {
       </section>
 
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        {intro && <RichText html={intro} className="mb-10 text-stone-300" />}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
             <Card title="Dove siamo">
