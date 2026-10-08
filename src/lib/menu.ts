@@ -43,3 +43,10 @@ export async function getMenuPage(page: string): Promise<CategoryWithItems[]> {
 
   return buildTree(categories, items ?? []);
 }
+
+/** Public: visible products placed directly on a page (no category). */
+export async function getPageDirectItems(page: string): Promise<MenuItem[]> {
+  const { data, error } = await supabase.from("menu_items").select("*").eq("page", page).is("category_id", null).eq("is_visible", true).order("sort_order");
+  if (error) throw error;
+  return data ?? [];
+}

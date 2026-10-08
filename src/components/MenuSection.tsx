@@ -25,12 +25,12 @@ function Category({ category, depth }: { category: CategoryWithItems; depth: num
 
   return (
     <section id={category.slug} className="scroll-mt-24">
-      <div className={`flex items-baseline justify-between border-b border-stone-700/50 ${depth === 0 ? "mb-6 pb-3" : "mb-4 pb-2 mt-6"}`}>
+      {category.name && <div className={`flex items-baseline justify-between border-b border-stone-700/50 ${depth === 0 ? "mb-6 pb-3" : "mb-4 pb-2 mt-6"}`}>
         <h2 className={depth === 0 ? "text-2xl sm:text-3xl font-serif text-amber-400" : "text-lg sm:text-xl font-serif text-amber-300/90"}>
           {category.name}
         </h2>
         {category.time_range && <span className="text-sm text-stone-400 tracking-wide">{category.time_range}</span>}
-      </div>
+      </div>}
 
       {category.description && <RichText html={category.description} className="text-stone-300 mb-4" />}
 

@@ -356,8 +356,33 @@ function CatalogTab() {
         <input className={`${inputCls} flex-1`} placeholder="Nome nuova categoria" onKeyDown={(e) => { if (e.key === "Enter" && newCat.trim()) { addCat(null, newCat.trim()); setNewCat(""); } }} value={newCat} onChange={(e) => setNewCat(e.target.value)} />
         <button className={addBtn} onClick={() => { if (newCat.trim()) { addCat(null, newCat.trim()); setNewCat(""); } }}><Plus className="w-3.5 h-3.5" /> Nuova categoria</button>
       </div>
+      <DirectItems page={page} cats={cats} />
       <CatList parent={null} depth={0} cats={cats} items={items} allCats={cats} reload={reload} reloadItems={loadItems} addCat={addCat} />
       {cats.length === 0 && <p className="text-center text-stone-500 italic">Nessuna categoria su questa pagina.</p>}
+    </div>
+  );
+}
+
+function DirectItems({ page, cats }: { page: string; cats: MenuCategory[] }) {
+  const [items, setItems] = useState<MenuItem[]>([]);
+  const [adding, setAdding] = useState(false);
+  const load = async () => {
+    const { data } = await supabase.from("menu_items").select("*").eq("page", page).is("category_id", null).order("sort_order");
+    setItems(data ?? []);
+  };
+  useEffect(() => { load(); }, [page, cats]);
+  async function add(d: { name: string; price: number; description: string }) {
+    const { error } = await supabase.from("menu_items").insert({ page, category_id: null, ...d, sort_order: items.length + 1 });
+    if (error) return alert(error.message);
+    setAdding(false); load();
+  }
+  return (
+    <div className={`${card} p-3 space-y-3`}>
+      <p className="font-serif text-amber-400">Prodotti diretti nella pagina (senza categoria)</p>
+      {items.map((it, i) => <ItemRow key={it.id} item={it} idx={i} list={items} cats={cats} reload={load} page={page} />)}
+      {items.length === 0 && <p className="text-sm text-stone-500 italic">Nessun prodotto diretto</p>}
+      {adding ? <NewItemForm onCreate={add} onCancel={() => setAdding(false)} />
+        : <button className={addBtn} onClick={() => setAdding(true)}><Plus className="w-3.5 h-3.5" /> Nuovo prodotto nella pagina</button>}
     </div>
   );
 }
@@ -411,7 +436,7 @@ function CatCard({ cat, idx, list, depth, ...p }: { cat: MenuCategory; idx: numb
   );
 }
 
-function ItemRow({ item, idx, list, cats, reload }: { item: MenuItem; idx: number; list: MenuItem[]; cats: MenuCategory[]; reload: () => void }) {
+function ItemRow({ item, idx, list, cats, reload, page }: { item: MenuItem; idx: number; list: MenuItem[]; cats: MenuCategory[]; reload: () => void; page?: string }) {
   const upd = (patch: Partial<MenuItem>) => supabase.from("menu_items").update(patch).eq("id", item.id).then(reload);
   return (
     <div className="rounded-lg border border-stone-800 p-3 space-y-2">
@@ -425,7 +450,8 @@ function ItemRow({ item, idx, list, cats, reload }: { item: MenuItem; idx: numbe
       <div className="flex flex-wrap gap-3 items-center text-xs text-stone-400">
         <label className="flex items-center gap-1"><input type="checkbox" checked={!!item.is_featured} onChange={(e) => upd({ is_featured: e.target.checked })} /> In evidenza</label>
         <label className="flex items-center gap-1">Sposta in:
-          <select className={`${inputCls} py-1`} value={item.category_id} onChange={(e) => upd({ category_id: e.target.value })}>
+          <select className={`${inputCls} py-1`} value={item.category_id ?? ""} onChange={(e) => upd(e.target.value ? { category_id: e.target.value } : { category_id: null, page: page ?? cats[0]?.page ?? item.page })}>
+            <option value="">— Nessuna categoria (diretto nella pagina) —</option>
             {cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </label>
