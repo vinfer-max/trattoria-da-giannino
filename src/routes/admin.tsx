@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Shield, Plus, Trash2, LogOut, ArrowUp, ArrowDown, Eye, EyeOff, Save, ImagePlus, ChevronRight } from "lucide-react";
+import { Shield, Plus, Trash2, LogOut, ArrowUp, ArrowDown, Eye, EyeOff, Save, ImagePlus, ChevronRight, Check } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { MenuCategory, MenuItem } from "@/lib/menu";
@@ -9,6 +9,7 @@ import { getSettings, saveSetting, slugify, uploadImage, type SitePage, type Hom
 import RichEditor from "@/components/RichEditor";
 import RichText from "@/components/RichText";
 import ContactsAdmin from "@/components/ContactsAdmin";
+import { formatPrice, parsePrice } from "@/lib/price";
 
 function DescEditor({ value, onSave, label = "descrizione" }: { value: string; onSave: (v: string) => void; label?: string }) {
   const [open, setOpen] = useState(false);
@@ -352,8 +353,8 @@ function CatalogTab() {
         </select>
       </div>
       <div className="flex gap-2">
-        <input className={`${inputCls} flex-1`} placeholder="Nuova categoria" value={newCat} onChange={(e) => setNewCat(e.target.value)} />
-        <button className={addBtn} onClick={() => { if (newCat.trim()) { addCat(null, newCat.trim()); setNewCat(""); } }}><Plus className="w-3.5 h-3.5" /> Categoria</button>
+        <input className={`${inputCls} flex-1`} placeholder="Nome nuova categoria" onKeyDown={(e) => { if (e.key === "Enter" && newCat.trim()) { addCat(null, newCat.trim()); setNewCat(""); } }} value={newCat} onChange={(e) => setNewCat(e.target.value)} />
+        <button className={addBtn} onClick={() => { if (newCat.trim()) { addCat(null, newCat.trim()); setNewCat(""); } }}><Plus className="w-3.5 h-3.5" /> Nuova categoria</button>
       </div>
       <CatList parent={null} depth={0} cats={cats} items={items} allCats={cats} reload={reload} reloadItems={loadItems} addCat={addCat} />
       {cats.length === 0 && <p className="text-center text-stone-500 italic">Nessuna categoria su questa pagina.</p>}
@@ -368,6 +369,7 @@ function CatList(props: { parent: string | null; depth: number; cats: MenuCatego
 
 function CatCard({ cat, idx, list, depth, ...p }: { cat: MenuCategory; idx: number; list: MenuCategory[] } & Parameters<typeof CatList>[0]) {
   const [open, setOpen] = useState(true);
+  const [adding, setAdding] = useState<"" | "item" | "sub">("");
   const catItems = p.items.filter((i) => i.category_id === cat.id);
   const upd = (patch: Partial<MenuCategory>) => supabase.from("menu_categories").update(patch).eq("id", cat.id).then(p.reload);
   async function del() {
@@ -377,9 +379,10 @@ function CatCard({ cat, idx, list, depth, ...p }: { cat: MenuCategory; idx: numb
     for (const id of [...ids].reverse()) await supabase.from("menu_categories").delete().eq("id", id);
     p.reload();
   }
-  async function addItem() {
-    await supabase.from("menu_items").insert({ category_id: cat.id, name: "Nuovo prodotto", price: 0, sort_order: catItems.length + 1 });
-    p.reloadItems();
+  async function addItem(d: { name: string; price: number; description: string }) {
+    const { error } = await supabase.from("menu_items").insert({ category_id: cat.id, ...d, sort_order: catItems.length + 1 });
+    if (error) return alert(error.message);
+    setAdding(""); p.reloadItems();
   }
   return (
     <div className={`${card} ${depth ? "ml-3 sm:ml-6" : ""} overflow-hidden`}>
@@ -387,7 +390,7 @@ function CatCard({ cat, idx, list, depth, ...p }: { cat: MenuCategory; idx: numb
         <button onClick={() => setOpen(!open)} className={btn}><ChevronRight className={`w-4 h-4 transition-transform ${open ? "rotate-90" : ""}`} /></button>
         <Field className="flex-1 min-w-[140px] font-serif text-amber-400" value={cat.name} onSave={(v) => upd({ name: v })} />
         <Field className="w-32" placeholder="Orario" value={cat.time_range ?? ""} onSave={(v) => upd({ time_range: v })} />
-        <Field className="w-24" type="number" placeholder="Coperto €" value={String(cat.cover_charge ?? 0)} onSave={(v) => upd({ cover_charge: parseFloat(v) || 0 })} />
+        <span className="text-xs text-stone-400">Coperto</span><PriceField placeholder="Coperto" value={Number(cat.cover_charge ?? 0)} onSave={(n) => upd({ cover_charge: n })} />
         <Controls table="menu_categories" list={list} idx={idx} visible={cat.is_visible} onDone={p.reload} onDelete={del} />
       </div>
       {open && (
@@ -395,10 +398,12 @@ function CatCard({ cat, idx, list, depth, ...p }: { cat: MenuCategory; idx: numb
           <DescEditor label="testo categoria" value={cat.description ?? ""} onSave={(v) => upd({ description: v })} />
           {catItems.map((it, i) => <ItemRow key={it.id} item={it} idx={i} list={catItems} cats={p.allCats} reload={p.reloadItems} />)}
           {catItems.length === 0 && <p className="text-sm text-stone-500 italic">Nessun prodotto</p>}
-          <div className="flex flex-wrap gap-2">
-            <button className={addBtn} onClick={addItem}><Plus className="w-3.5 h-3.5" /> Prodotto</button>
-            <button className={addBtn} onClick={() => { const n = prompt("Nome sottocategoria"); if (n?.trim()) p.addCat(cat.id, n.trim()); }}><Plus className="w-3.5 h-3.5" /> Sottocategoria</button>
-          </div>
+          {adding === "item" && <NewItemForm onCreate={addItem} onCancel={() => setAdding("")} />}
+          {adding === "sub" && <NewNameForm label="Nome nuova sottocategoria" onCreate={(n) => { p.addCat(cat.id, n); setAdding(""); }} onCancel={() => setAdding("")} />}
+          {!adding && <div className="flex flex-wrap gap-2">
+            <button className={addBtn} onClick={() => setAdding("item")}><Plus className="w-3.5 h-3.5" /> Nuovo prodotto</button>
+            <button className={addBtn} onClick={() => setAdding("sub")}><Plus className="w-3.5 h-3.5" /> Nuova sottocategoria</button>
+          </div>}
           <CatList {...p} parent={cat.id} depth={depth + 1} />
         </div>
       )}
@@ -412,7 +417,7 @@ function ItemRow({ item, idx, list, cats, reload }: { item: MenuItem; idx: numbe
     <div className="rounded-lg border border-stone-800 p-3 space-y-2">
       <div className="flex flex-wrap gap-2 items-center">
         <Field className="flex-1 min-w-[140px]" value={item.name} onSave={(v) => upd({ name: v })} />
-        <Field className="w-24" type="number" placeholder="Prezzo" value={String(item.price)} onSave={(v) => upd({ price: parseFloat(v) || 0 })} />
+        <PriceField value={Number(item.price)} onSave={(n) => upd({ price: n })} />
         <Controls table="menu_items" list={list} idx={idx} visible={item.is_visible} onDone={reload}
           onDelete={() => supabase.from("menu_items").delete().eq("id", item.id).then(reload)} />
       </div>
