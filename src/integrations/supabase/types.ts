@@ -153,7 +153,7 @@ export type Database = {
       }
       menu_items: {
         Row: {
-          category_id: string
+          category_id: string | null
           created_at: string | null
           description: string | null
           id: string
@@ -161,11 +161,12 @@ export type Database = {
           is_featured: boolean | null
           is_visible: boolean
           name: string
+          page: string | null
           price: number
           sort_order: number | null
         }
         Insert: {
-          category_id: string
+          category_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -173,11 +174,12 @@ export type Database = {
           is_featured?: boolean | null
           is_visible?: boolean
           name: string
+          page?: string | null
           price?: number
           sort_order?: number | null
         }
         Update: {
-          category_id?: string
+          category_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -185,6 +187,7 @@ export type Database = {
           is_featured?: boolean | null
           is_visible?: boolean
           name?: string
+          page?: string | null
           price?: number
           sort_order?: number | null
         }

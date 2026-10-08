@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getMenuPage } from "@/lib/menu";
+import { getMenuPage, getPageDirectItems, type CategoryWithItems } from "@/lib/menu";
+import { getPageBySlug } from "@/lib/cms";
 import MenuSection from "./MenuSection";
 
 export default function MenuPageView({
@@ -22,6 +23,15 @@ export default function MenuPageView({
     queryKey: ["menu", page],
     queryFn: () => getMenuPage(page),
   });
+  const { data: direct = [] } = useQuery({ queryKey: ["menu-direct", page], queryFn: () => getPageDirectItems(page) });
+  const { data: pageInfo } = useQuery({ queryKey: ["page", page], queryFn: () => getPageBySlug(page) });
+  if (pageInfo) {
+    title = pageInfo.title || title;
+    subtitle = pageInfo.subtitle ?? subtitle;
+  }
+  const all: CategoryWithItems[] = direct.length
+    ? [{ id: "direct", slug: "prodotti", name: "", page, items: direct, children: [], description: "", time_range: "", cover_charge: 0, sort_order: 0, parent_id: null, is_visible: true, created_at: null } as CategoryWithItems, ...categories]
+    : categories;
 
   return (
     <div className="pt-20 sm:pt-24">
@@ -56,7 +66,7 @@ export default function MenuPageView({
         ) : (
           <>
             {note && <p className="text-sm text-stone-400 italic mb-8 text-center">{note}</p>}
-            <MenuSection categories={categories} />
+            <MenuSection categories={all} />
           </>
         )}
       </section>
