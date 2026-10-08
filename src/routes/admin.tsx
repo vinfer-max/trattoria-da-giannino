@@ -214,7 +214,74 @@ function useList<T>(table: string, filter?: (q: any) => any, deps: unknown[] = [
 function Field({ value, onSave, className = "", placeholder, type = "text" }: { value: string; onSave: (v: string) => void; className?: string; placeholder?: string; type?: string }) {
   const [v, setV] = useState(value);
   useEffect(() => setV(value), [value]);
-  return <input type={type} className={`${inputCls} ${className}`} value={v} placeholder={placeholder} onChange={(e) => setV(e.target.value)} onBlur={() => v !== value && onSave(v)} />;
+  return <input type={type} className={`${inputCls} ${className}`} value={v} placeholder={placeholder} onChange={(e) => setV(e.target.value)} onBlur={() => v !== value && onSave(v)} onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()} />;
+}
+
+/** Price input: accepts comma or dot, shows "3,50", saves with Enter, ✓ button or leaving the field. */
+function PriceField({ value, onSave, placeholder = "Prezzo €" }: { value: number; onSave: (n: number) => Promise<unknown> | void; placeholder?: string }) {
+  const [v, setV] = useState(formatPrice(value));
+  const [status, setStatus] = useState<"" | "saved" | "error">("");
+  useEffect(() => setV(formatPrice(value)), [value]);
+  async function commit() {
+    const n = parsePrice(v);
+    if (n === null) { setStatus("error"); return; }
+    setV(formatPrice(n));
+    if (n === Number(value)) return;
+    await onSave(n);
+    setStatus("saved"); setTimeout(() => setStatus(""), 2000);
+  }
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className="text-stone-400 text-sm">€</span>
+      <input inputMode="decimal" className={`${inputCls} w-24 text-right ${status === "error" ? "border-red-500" : ""}`} value={v} placeholder={placeholder}
+        onChange={(e) => { setV(e.target.value); setStatus(""); }} onBlur={commit} onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()} />
+      <button type="button" title="Salva prezzo" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={commit}><Check className="w-4 h-4" /></button>
+      {status === "saved" && <span className="text-xs text-emerald-400">Salvato</span>}
+      {status === "error" && <span className="text-xs text-red-400">Prezzo non valido</span>}
+    </span>
+  );
+}
+
+/** Inline form to create a product with name, price and description. */
+function NewItemForm({ onCreate, onCancel }: { onCreate: (d: { name: string; price: number; description: string }) => Promise<void>; onCancel: () => void }) {
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [desc, setDesc] = useState("");
+  const [err, setErr] = useState("");
+  async function submit() {
+    const p = parsePrice(price);
+    if (!name.trim()) return setErr("Inserisci il nome");
+    if (p === null) return setErr("Prezzo non valido");
+    await onCreate({ name: name.trim(), price: p, description: desc });
+  }
+  return (
+    <div className="rounded-lg border border-amber-500/40 p-3 space-y-2 bg-amber-500/5">
+      <p className="text-sm text-amber-400 font-semibold">Nuovo prodotto</p>
+      <div className="flex flex-wrap gap-2">
+        <input autoFocus className={`${inputCls} flex-1 min-w-[160px]`} placeholder="Nome prodotto" value={name} onChange={(e) => setName(e.target.value)} />
+        <input inputMode="decimal" className={`${inputCls} w-28 text-right`} placeholder="Prezzo es. 3,50" value={price} onChange={(e) => setPrice(e.target.value)} onBlur={() => { const p = parsePrice(price); if (p !== null && price) setPrice(formatPrice(p)); }} />
+      </div>
+      <RichEditor value={desc} onChange={setDesc} />
+      {err && <p className="text-xs text-red-400">{err}</p>}
+      <div className="flex gap-2">
+        <button className={addBtn} onClick={submit}><Check className="w-3.5 h-3.5" /> Crea prodotto</button>
+        <button className={btn} onClick={onCancel}>Annulla</button>
+      </div>
+    </div>
+  );
+}
+
+/** Inline name input used to create categories/subcategories. */
+function NewNameForm({ label, onCreate, onCancel }: { label: string; onCreate: (n: string) => void; onCancel: () => void }) {
+  const [n, setN] = useState("");
+  const go = () => n.trim() && onCreate(n.trim());
+  return (
+    <div className="flex flex-wrap gap-2 items-center rounded-lg border border-amber-500/40 p-2 bg-amber-500/5">
+      <input autoFocus className={`${inputCls} flex-1 min-w-[160px]`} placeholder={label} value={n} onChange={(e) => setN(e.target.value)} onKeyDown={(e) => e.key === "Enter" && go()} />
+      <button className={addBtn} onClick={go}><Check className="w-3.5 h-3.5" /> Crea</button>
+      <button className={btn} onClick={onCancel}>Annulla</button>
+    </div>
+  );
 }
 
 /* ---------------- Pagine ---------------- */
