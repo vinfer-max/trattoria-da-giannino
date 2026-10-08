@@ -219,7 +219,7 @@ function Field({ value, onSave, className = "", placeholder, type = "text" }: { 
 }
 
 /** Price input: accepts comma or dot, shows "3,50", saves with Enter, ✓ button or leaving the field. */
-function PriceField({ value, onSave, placeholder = "Prezzo €" }: { value: number; onSave: (n: number) => Promise<unknown> | void; placeholder?: string }) {
+function PriceField({ value, onSave, placeholder = "Prezzo €" }: { value: number; onSave: (n: number) => PromiseLike<unknown> | void; placeholder?: string }) {
   const [v, setV] = useState(formatPrice(value));
   const [status, setStatus] = useState<"" | "saved" | "error">("");
   useEffect(() => setV(formatPrice(value)), [value]);
