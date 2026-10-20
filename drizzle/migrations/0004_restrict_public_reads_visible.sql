@@ -1,0 +1,14 @@
+DROP POLICY IF EXISTS "Public read items" ON public.menu_items;
+CREATE POLICY "Public read items" ON public.menu_items FOR SELECT TO anon, authenticated USING (is_visible = true);
+DROP POLICY IF EXISTS "Public read categories" ON public.menu_categories;
+CREATE POLICY "Public read categories" ON public.menu_categories FOR SELECT TO anon, authenticated USING (is_visible = true);
+DROP POLICY IF EXISTS "Public read sections" ON public.home_sections;
+CREATE POLICY "Public read sections" ON public.home_sections FOR SELECT TO anon, authenticated USING (is_visible = true);
+DROP POLICY IF EXISTS "Public read events" ON public.events;
+CREATE POLICY "Public read events" ON public.events FOR SELECT TO anon, authenticated USING (is_visible = true);
+DROP POLICY IF EXISTS "Public read pages" ON public.site_pages;
+CREATE POLICY "Public read pages" ON public.site_pages FOR SELECT TO anon, authenticated USING (is_visible = true);
+DROP POLICY IF EXISTS "Public read slides" ON public.home_slides;
+CREATE POLICY "Public read slides" ON public.home_slides FOR SELECT TO anon, authenticated USING (is_visible = true);
+DROP POLICY IF EXISTS "Public read site images" ON storage.objects;
+CREATE POLICY "Admins read site images" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'site-images' AND public.has_role(auth.uid(),'admin'));
