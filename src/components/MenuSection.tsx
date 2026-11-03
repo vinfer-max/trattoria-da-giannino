@@ -88,7 +88,9 @@ function Category({ category, depth }: { category: CategoryWithItems; depth: num
                     {item.name}
                   </span>
                   {item.description && (
-                    <RichText html={item.description} className={`text-sm mt-0.5 ${isWine ? "text-stone-500 italic" : "text-stone-400"}`} />
+                    showGeoPrefix
+                      ? <GeoWineDescription description={item.description} />
+                      : <RichText html={item.description} className={`text-sm mt-0.5 ${isWine ? "text-stone-500 italic" : "text-stone-400"}`} />
                   )}
                 </div>
                 {price > 0 && (
