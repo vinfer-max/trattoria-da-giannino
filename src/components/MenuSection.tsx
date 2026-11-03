@@ -18,8 +18,28 @@ const SIGNATURE_SORT = 1;
 const MIXOLOGY_START_SORT = 2;
 const MIXOLOGY_ZERO_START_SORT = 20;
 
+/** Wine items whose category ends with -nazionali/-internazionali show a bold amber geographic prefix. */
+function isGeoWineCategory(slug: string): boolean {
+  return slug.endsWith("-nazionali") || slug.endsWith("-internazionali");
+}
+
+function GeoWineDescription({ description }: { description: string }) {
+  const idx = description.indexOf(" — ");
+  if (idx === -1) {
+    return <RichText html={description} className="text-stone-500 italic" />;
+  }
+  return (
+    <span className="block text-sm mt-0.5 text-stone-500 italic">
+      <strong className="font-bold text-amber-400 not-italic">{description.slice(0, idx)}</strong>
+      <span>{" — "}</span>
+      <span>{description.slice(idx + 3)}</span>
+    </span>
+  );
+}
+
 function Category({ category, depth }: { category: CategoryWithItems; depth: number }) {
   const isWine = WINE_SLUGS.includes(category.slug);
+  const showGeoPrefix = isWine && isGeoWineCategory(category.slug);
   const isCocktails = category.slug === COCKTAILS_SLUG;
   const cover = Number(category.cover_charge ?? 0);
 
@@ -68,7 +88,9 @@ function Category({ category, depth }: { category: CategoryWithItems; depth: num
                     {item.name}
                   </span>
                   {item.description && (
-                    <RichText html={item.description} className={`text-sm mt-0.5 ${isWine ? "text-stone-500 italic" : "text-stone-400"}`} />
+                    showGeoPrefix
+                      ? <GeoWineDescription description={item.description} />
+                      : <RichText html={item.description} className={`text-sm mt-0.5 ${isWine ? "text-stone-500 italic" : "text-stone-400"}`} />
                   )}
                 </div>
                 {price > 0 && (
