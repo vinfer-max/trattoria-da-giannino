@@ -34,7 +34,9 @@ function Contatti() {
   const contacts = parseContacts(settings?.[CONTACTS_KEY]);
   const maps = mapsLink(contacts.mapAddress);
   const browserKey = import.meta.env['VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY'];
-  const mapUrl = browserKey ? `https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(browserKey)}&q=${encodeURIComponent(contacts.mapAddress)}&language=it` : null;
+  const mapUrl = browserKey
+    ? `https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(browserKey)}&q=${encodeURIComponent(contacts.mapAddress)}&language=it`
+    : `https://www.google.com/maps?q=${encodeURIComponent(contacts.mapAddress)}&output=embed&hl=it`;
   const instagram = contacts.instagram.replace(/^@/, "").trim();
   return (
     <div className="pt-20 sm:pt-24">
