@@ -10,4 +10,5 @@
 <!-- LOVABLE:END -->
 
 - Store contact details as one validated object in site_settings and share defaults between public and Admin views, so existing details remain editable without duplication.
+- Keep sticky menu indexes in MenuPageView and measure their height for section scroll offsets, so wrapped category links never cover destination titles.
 - Render the contact map through Google Maps Embed using the connector's public browser key and the saved address; no billable server lookup is needed.

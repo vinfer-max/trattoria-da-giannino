@@ -164,6 +164,16 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 html { scroll-behavior: smooth; }
+.menu-page--indexed { --menu-header-height: 4rem; --menu-index-height: 0px; }
+.menu-page--indexed section[id] {
+  scroll-margin-top: calc(var(--menu-header-height) + var(--menu-index-height) + 1rem);
+}
+@media (min-width: 640px) {
+  .menu-page--indexed { --menu-header-height: 5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #0c0a09; }
 ::-webkit-scrollbar-thumb { background: #292524; border-radius: 3px; }
