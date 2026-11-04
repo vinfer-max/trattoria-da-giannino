@@ -7,13 +7,13 @@ import { getPageBySlug } from "@/lib/cms";
 export const Route = createFileRoute("/p/$slug")({
   head: ({ params }) => {
     const t = params.slug.replace(/-/g, " ");
-    const title = `${t.charAt(0).toUpperCase()}${t.slice(1)} — Giannino Bistrot Cafè`;
+    const title = `${t.charAt(0).toUpperCase()}${t.slice(1)} — Trattoria da Giannino est. 1974`;
     return {
       meta: [
         { title },
-        { name: "description", content: `${t} — Giannino Bistrot Cafè, Santo Stefano di Camastra.` },
+        { name: "description", content: `${t} — Trattoria da Giannino est. 1974, Santo Stefano di Camastra.` },
         { property: "og:title", content: title },
-        { property: "og:description", content: `${t} — Giannino Bistrot Cafè.` },
+        { property: "og:description", content: `${t} — Trattoria da Giannino est. 1974.` },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary" },
       ],

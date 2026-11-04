@@ -35,11 +35,13 @@ function DescEditor({ value, onSave, label = "descrizione" }: { value: string; o
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin — Giannino Bistrot Cafè" },
+      { title: "Admin — Trattoria da Giannino est. 1974" },
       { name: "description", content: "Gestione menù e contenuti." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Admin — Giannino Bistrot Cafè" },
+      { property: "og:title", content: "Admin — Trattoria da Giannino est. 1974" },
       { property: "og:description", content: "Gestione menù e contenuti." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AdminGate,

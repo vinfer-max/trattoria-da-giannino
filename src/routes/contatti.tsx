@@ -8,9 +8,9 @@ import { CONTACTS_KEY, mapsLink, parseContacts } from "@/lib/contacts";
 export const Route = createFileRoute("/contatti")({
   head: () => ({
     meta: [
-      { title: "Contatti — Giannino Bistrot Cafè" },
+      { title: "Contatti — Trattoria da Giannino est. 1974" },
       { name: "description", content: "Via Nazionale 34, Santo Stefano di Camastra (ME). Tel. 0921 995719." },
-      { property: "og:title", content: "Contatti — Giannino Bistrot Cafè" },
+      { property: "og:title", content: "Contatti — Trattoria da Giannino est. 1974" },
       { property: "og:description", content: "Vieni a trovarci a Santo Stefano di Camastra." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -87,7 +87,7 @@ function Contatti() {
 
           {contacts.mapVisible && <div className="rounded-lg overflow-hidden border border-site-border bg-site-panel flex flex-col min-w-0">
             {mapUrl ? <iframe
-              title="Mappa Giannino Bistrot Cafè"
+              title="Mappa Trattoria da Giannino est. 1974"
               src={mapUrl}
               width="100%"
               height="100%"

@@ -19,6 +19,7 @@
  */
 
 @theme inline {
+  --color-site-logo: oklch(0.985 0.001 106.423);
   --color-site-bg: oklch(0.147 0.004 49.25);
   --color-site-panel: oklch(0.268 0.007 34.298);
   --color-site-text: oklch(0.97 0.001 106.424);

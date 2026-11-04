@@ -64,12 +64,12 @@ export default function Layout({ children }: { children: ReactNode }) {
             <Link to="/" className="flex items-center gap-3 group">
               <img
                 src={logo}
-                alt="Giannino Bistrot Cafè"
-                className="h-10 sm:h-12 w-auto rounded-md bg-stone-50 object-contain shrink-0"
+                alt="Trattoria da Giannino est. 1974"
+                className="h-10 sm:h-12 w-auto bg-site-logo p-1 object-contain shrink-0"
               />
-              <div className="leading-tight">
-                <div className="text-base sm:text-lg font-serif font-semibold tracking-wide text-stone-50">
-                  Giannino Bistrot &middot; Cafè
+              <div className="min-w-0 leading-tight">
+                <div className="text-sm sm:text-lg font-serif font-semibold text-site-text">
+                  Trattoria da Giannino
                 </div>
                 <div className="text-[10px] sm:text-xs tracking-[0.25em] text-amber-500/80 uppercase">
                   Est. 1974
@@ -122,8 +122,8 @@ export default function Layout({ children }: { children: ReactNode }) {
         >
           <div className="p-6 pt-20">
             <div className="mb-8 flex flex-col items-center text-center">
-              <img src={logo} alt="Giannino Bistrot Cafè" className="h-20 w-auto rounded-lg bg-stone-50 object-contain mb-3" />
-              <div className="font-serif text-lg text-stone-100">Giannino Bistrot &middot; Cafè</div>
+              <img src={logo} alt="Trattoria da Giannino est. 1974" className="h-20 w-auto bg-site-logo p-1 object-contain mb-3" />
+              <div className="font-serif text-lg text-stone-100">Trattoria da Giannino</div>
               <div className="text-xs tracking-[0.25em] text-amber-500/80 uppercase mt-0.5">Est. 1974</div>
             </div>
             <nav className="flex flex-col gap-1">
@@ -150,8 +150,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       <footer className="border-t border-stone-800/60 bg-stone-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col items-center text-center">
-            <img src={logo} alt="Giannino Bistrot Cafè" className="h-20 w-auto rounded-lg bg-stone-50 object-contain mb-4" />
-            <div className="font-serif text-lg text-stone-100 mb-1">Giannino Bistrot &middot; Cafè</div>
+            <img src={logo} alt="Trattoria da Giannino est. 1974" className="h-20 w-auto bg-site-logo p-1 object-contain mb-4" />
+            <div className="font-serif text-lg text-stone-100 mb-1">Trattoria da Giannino est. 1974</div>
             <p className="text-sm text-stone-500 mb-6">Stesse radici, nuovo orizzonte.</p>
             <div className="flex flex-wrap gap-4 justify-center mb-6">
               {navLinks.map((link) => (
@@ -161,7 +161,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               ))}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-stone-600">
-              <span>&copy; {new Date().getFullYear()} Giannino Bistrot Cafè. Tutti i diritti riservati.</span>
+              <span>&copy; {new Date().getFullYear()} Trattoria da Giannino est. 1974. Tutti i diritti riservati.</span>
               <Button asChild variant="link" size="sm" className="h-auto px-0 py-1 text-xs text-site-muted hover:text-site-accent">
                 <Link to="/admin"><LockKeyhole className="size-3" aria-hidden="true" />Area Riservata</Link>
               </Button>
