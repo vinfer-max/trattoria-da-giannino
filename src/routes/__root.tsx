@@ -79,8 +79,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Giannino Bistrot Cafè — Est. 1974" },
-      { name: "description", content: "Giannino Bistrot Cafè, Santo Stefano di Camastra." },
+      { title: "Trattoria da Giannino est. 1974" },
+      { name: "description", content: "Trattoria da Giannino est. 1974, Santo Stefano di Camastra." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

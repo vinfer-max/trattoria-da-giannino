@@ -5,10 +5,12 @@ import MenuPageView from "@/components/MenuPageView";
 export const Route = createFileRoute("/drink")({
   head: () => ({
     meta: [
-      { title: "Drink List — Giannino Bistrot Cafè" },
-      { name: "description", content: "Cocktail, birre e spirits di Giannino Bistrot Cafè." },
-      { property: "og:title", content: "Drink List — Giannino Bistrot Cafè" },
+      { title: "Drink List — Trattoria da Giannino est. 1974" },
+      { name: "description", content: "Cocktail, birre e spirits di Trattoria da Giannino est. 1974." },
+      { property: "og:title", content: "Drink List — Trattoria da Giannino est. 1974" },
       { property: "og:description", content: "Cocktail, birre e spirits." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: () => (

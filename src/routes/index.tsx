@@ -11,9 +11,9 @@ const fallbackHero = heroAsset.url;
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Giannino Bistrot Cafè — Est. 1974" },
+      { title: "Trattoria da Giannino est. 1974" },
       { name: "description", content: "Stesse radici, nuovo orizzonte. Colazione, brunch, pranzo, lounge e aperitivi a Santo Stefano di Camastra." },
-      { property: "og:title", content: "Giannino Bistrot Cafè — Est. 1974" },
+      { property: "og:title", content: "Trattoria da Giannino est. 1974" },
       { property: "og:description", content: "Stesse radici, nuovo orizzonte. Accanto alla tradizione, nasce un nuovo gusto." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

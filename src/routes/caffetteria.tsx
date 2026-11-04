@@ -5,10 +5,12 @@ import MenuPageView from "@/components/MenuPageView";
 export const Route = createFileRoute("/caffetteria")({
   head: () => ({
     meta: [
-      { title: "Caffetteria — Giannino Bistrot Cafè" },
+      { title: "Caffetteria — Trattoria da Giannino est. 1974" },
       { name: "description", content: "Caffè, cappuccino, tisane e dolci della tradizione." },
-      { property: "og:title", content: "Caffetteria — Giannino Bistrot Cafè" },
+      { property: "og:title", content: "Caffetteria — Trattoria da Giannino est. 1974" },
       { property: "og:description", content: "Caffè, cappuccino, tisane e dolci della tradizione." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: () => (

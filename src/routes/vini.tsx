@@ -5,10 +5,12 @@ import MenuPageView from "@/components/MenuPageView";
 export const Route = createFileRoute("/vini")({
   head: () => ({
     meta: [
-      { title: "Carta dei Vini — Giannino Bistrot Cafè" },
+      { title: "Carta dei Vini — Trattoria da Giannino est. 1974" },
       { name: "description", content: "Selezione di etichette siciliane, nazionali e internazionali." },
-      { property: "og:title", content: "Carta dei Vini — Giannino Bistrot Cafè" },
+      { property: "og:title", content: "Carta dei Vini — Trattoria da Giannino est. 1974" },
       { property: "og:description", content: "Selezione di etichette siciliane, nazionali e internazionali." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: () => (
