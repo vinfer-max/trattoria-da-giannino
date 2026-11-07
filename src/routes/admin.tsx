@@ -294,13 +294,13 @@ function PageDialog({ page, count, onClose, onSaved }: { page: SitePage | null; 
   const [visible, setVisible] = useState(page?.is_visible ?? true);
   const [saving, setSaving] = useState(false);
   async function save() {
-    if (!title.trim()) return toast.error("Inserisci un nome");
+    if (!title.trim()) { toast.error("Inserisci un nome"); return; }
     setSaving(true);
     const { error } = page
       ? await supabase.from("site_pages").update({ title: title.trim(), subtitle: subtitle.trim() || null, is_visible: visible }).eq("id", page.id)
       : await supabase.from("site_pages").insert({ title: title.trim(), subtitle: subtitle.trim() || null, is_visible: visible, slug: `${slugify(title) || "pagina"}-${Math.random().toString(36).slice(2, 6)}`, sort_order: count + 1 });
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Pagina salvata"); onSaved();
   }
   return (
@@ -329,7 +329,7 @@ function CategoriesManager({ page, categories, loading, onChange }: { page: stri
 
   async function toggle(c: MenuCategory) {
     const { error } = await supabase.from("menu_categories").update({ is_visible: !c.is_visible }).eq("id", c.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(c.is_visible ? "Categoria nascosta" : "Categoria visibile"); onChange();
   }
   async function doDelete(c: MenuCategory) {
@@ -408,9 +408,9 @@ function CategoryDialog({ page, categories, category, onClose, onSaved }: { page
   const possibleParents = categories.filter((c) => !blocked.has(c.id));
 
   async function save() {
-    if (!name.trim()) return toast.error("Nome obbligatorio");
+    if (!name.trim()) { toast.error("Nome obbligatorio"); return; }
     const coverN = cover.trim() ? parsePrice(cover) : 0;
-    if (coverN === null) return toast.error("Coperto non valido");
+    if (coverN === null) { toast.error("Coperto non valido"); return; }
     setSaving(true);
     const parent = parentId === NONE ? null : parentId;
     const base = { name: name.trim(), description: cleanRich(description), time_range: timeRange.trim() || null, cover_charge: coverN || null, parent_id: parent, is_visible: visible };
@@ -419,7 +419,7 @@ function CategoryDialog({ page, categories, category, onClose, onSaved }: { page
       ? await supabase.from("menu_categories").update(category.parent_id === parent ? base : { ...base, sort_order: siblings.length + 1 }).eq("id", category.id)
       : await supabase.from("menu_categories").insert({ ...base, page, slug: `${slugify(name) || "cat"}-${Date.now().toString(36)}`, sort_order: siblings.length + 1 });
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(category ? "Categoria aggiornata" : "Categoria creata"); onSaved();
   }
 
@@ -491,12 +491,12 @@ function ProductsManager({ page, categories, products, loading, onChange }: { pa
 
   async function patch(p: MenuItem, fields: Partial<MenuItem>) {
     const { error } = await supabase.from("menu_items").update(fields).eq("id", p.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     onChange();
   }
   async function doDelete(p: MenuItem) {
     const { error } = await supabase.from("menu_items").delete().eq("id", p.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Prodotto eliminato"); setToDelete(null); onChange();
   }
 
@@ -569,9 +569,9 @@ function ProductDialog({ page, categories, products, product, defaultCategoryId,
   const [saving, setSaving] = useState(false);
 
   async function save() {
-    if (!name.trim()) return toast.error("Nome obbligatorio");
+    if (!name.trim()) { toast.error("Nome obbligatorio"); return; }
     const n = price.trim() ? parsePrice(price) : 0;
-    if (n === null) return toast.error("Prezzo non valido");
+    if (n === null) { toast.error("Prezzo non valido"); return; }
     setSaving(true);
     const cat = categoryId === NONE ? null : categoryId;
     const base = { name: name.trim(), description: cleanRich(description) || null, price: n, category_id: cat, page: cat ? null : page, is_visible: visible, is_featured: featured, image_url: imageUrl || null };
@@ -582,7 +582,7 @@ function ProductDialog({ page, categories, products, product, defaultCategoryId,
       ? await supabase.from("menu_items").update(payload).eq("id", product.id)
       : await supabase.from("menu_items").insert(payload);
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(product ? "Prodotto aggiornato" : "Prodotto creato"); onSaved();
   }
 
