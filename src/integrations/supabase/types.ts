@@ -163,6 +163,7 @@ export type Database = {
           name: string
           page: string | null
           price: number
+          price_color: string | null
           sort_order: number | null
         }
         Insert: {
@@ -176,6 +177,7 @@ export type Database = {
           name: string
           page?: string | null
           price?: number
+          price_color?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -189,6 +191,7 @@ export type Database = {
           name?: string
           page?: string | null
           price?: number
+          price_color?: string | null
           sort_order?: number | null
         }
         Relationships: [
@@ -204,6 +207,7 @@ export type Database = {
       site_pages: {
         Row: {
           created_at: string | null
+          icon: string
           id: string
           is_system: boolean
           is_visible: boolean
@@ -214,6 +218,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          icon?: string
           id?: string
           is_system?: boolean
           is_visible?: boolean
@@ -224,6 +229,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          icon?: string
           id?: string
           is_system?: boolean
           is_visible?: boolean
