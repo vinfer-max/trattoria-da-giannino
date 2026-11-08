@@ -43,6 +43,13 @@
       "when": 1794096309020,
       "tag": "0005_page_icon_price_color",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794096317966,
+      "tag": "0006_page_content",
+      "breakpoints": true
     }
   ]
 }

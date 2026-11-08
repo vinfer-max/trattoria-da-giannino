@@ -206,6 +206,7 @@ export type Database = {
       }
       site_pages: {
         Row: {
+          content: string
           created_at: string | null
           icon: string
           id: string
@@ -217,6 +218,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          content?: string
           created_at?: string | null
           icon?: string
           id?: string
@@ -228,6 +230,7 @@ export type Database = {
           title: string
         }
         Update: {
+          content?: string
           created_at?: string | null
           icon?: string
           id?: string

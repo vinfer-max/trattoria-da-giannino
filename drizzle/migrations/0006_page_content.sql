@@ -1,0 +1,1 @@
+ALTER TABLE public.site_pages ADD COLUMN IF NOT EXISTS content text NOT NULL DEFAULT '';
