@@ -19,7 +19,9 @@
  */
 
 @theme inline {
-  --color-site-logo: oklch(0.985 0.001 106.423);
+  --color-site-logo: oklch(0.95 0.02 85);
+  --color-site-plate: oklch(0.24 0.035 160);
+  --color-site-gold: oklch(0.76 0.12 80);
   --color-site-bg: oklch(0.147 0.004 49.25);
   --color-site-panel: oklch(0.268 0.007 34.298);
   --color-site-text: oklch(0.97 0.001 106.424);
@@ -177,3 +179,15 @@ html { scroll-behavior: smooth; }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #0c0a09; }
 ::-webkit-scrollbar-thumb { background: #292524; border-radius: 3px; }
+
+/* Bistro sign plate around the logo: dark forest frame, thin gold rule, cream inner panel. */
+.logo-plate {
+  background-color: var(--color-site-logo);
+  padding: 3px;
+  border: 1px solid var(--color-site-gold);
+  outline: 4px solid var(--color-site-plate);
+  outline-offset: 0;
+  box-shadow: 0 0 0 5px var(--color-site-gold), 0 6px 18px oklch(0 0 0 / 0.45);
+  border-radius: 2px;
+  margin: 6px;
+}
