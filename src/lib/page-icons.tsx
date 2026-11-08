@@ -44,7 +44,7 @@ export const PAGE_ICONS: Record<string, { label: string; Icon: LucideIcon }> = {
   gift: { label: "Regalo", Icon: Gift },
 };
 
-export function PageIcon({ name, fallback }: { name?: string | null; fallback?: React.ReactNode }) {
+export function PageIcon({ name, fallback }: { name?: string | null | undefined; fallback?: React.ReactNode }) {
   const entry = name ? PAGE_ICONS[name] : undefined;
   if (!entry) return <>{fallback ?? null}</>;
   const { Icon } = entry;

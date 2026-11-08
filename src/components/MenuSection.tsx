@@ -42,7 +42,7 @@ function GeoWineDescription({ description }: { description: string }) {
   );
 }
 
-function Category({ category, depth, priceColor }: { category: CategoryWithItems; depth: number; priceColor?: string }) {
+function Category({ category, depth, priceColor }: { category: CategoryWithItems; depth: number; priceColor?: string | undefined }) {
   const isWine = WINE_SLUGS.includes(category.slug);
   const showGeoPrefix = isWine && isGeoWineCategory(category.slug);
   const isCocktails = category.slug === COCKTAILS_SLUG;
