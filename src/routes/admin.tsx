@@ -10,7 +10,10 @@ import { slugify, uploadImage, type SitePage } from "@/lib/cms";
 import { formatPrice, parsePrice } from "@/lib/price";
 import RichEditor from "@/components/RichEditor";
 import ContactsAdmin from "@/components/ContactsAdmin";
-import { HomeTab, EventsTab } from "@/components/HomeEventsAdmin";
+import { HomeTab } from "@/components/HomeEventsAdmin";
+import { PAGE_ICONS, PageIcon } from "@/lib/page-icons";
+import { getSettings, saveSetting } from "@/lib/cms";
+import { PRICE_COLOR_KEY } from "@/components/MenuSection";
 import { SortableList } from "@/components/SortableList";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
@@ -55,6 +58,11 @@ function AdminGate() {
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+    return () => document.documentElement.classList.remove("dark");
+  }, []);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
@@ -110,7 +118,7 @@ function LoginForm() {
 }
 
 /* ---------------- Pannello ---------------- */
-type Tab = "products" | "categories" | "sections" | "contacts" | "home" | "events";
+type Tab = "products" | "categories" | "sections" | "contacts" | "home";
 
 function AdminPage() {
   const qc = useQueryClient();
@@ -176,13 +184,12 @@ function AdminPage() {
       )}
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)}>
-        <TabsList className="grid h-auto w-full max-w-xl grid-cols-3 gap-1 [&>button]:min-w-0 [&>button]:py-2">
+        <TabsList className="grid h-auto w-full max-w-xl grid-cols-3 sm:grid-cols-5 gap-1 [&>button]:min-w-0 [&>button]:py-2">
           <TabsTrigger value="products">Prodotti</TabsTrigger>
           <TabsTrigger value="categories">Categorie</TabsTrigger>
           <TabsTrigger value="sections">Pagine</TabsTrigger>
           <TabsTrigger value="contacts">Contatti</TabsTrigger>
           <TabsTrigger value="home">Home</TabsTrigger>
-          <TabsTrigger value="events">Eventi</TabsTrigger>
         </TabsList>
         <TabsContent value="products" className="mt-6">
           <ProductsManager page={page} categories={categories} products={products} loading={loadingData} onChange={refresh} />
@@ -195,7 +202,6 @@ function AdminPage() {
         </TabsContent>
         <TabsContent value="contacts" className="mt-6"><DarkPanel><ContactsAdmin /></DarkPanel></TabsContent>
         <TabsContent value="home" className="mt-6"><DarkPanel><HomeTab /></DarkPanel></TabsContent>
-        <TabsContent value="events" className="mt-6"><DarkPanel><EventsTab /></DarkPanel></TabsContent>
       </Tabs>
     </div>
   );
@@ -268,9 +274,10 @@ function PagesManager({ pages, onChange }: { pages: SitePage[]; onChange: () => 
         <SortableList items={pages} onReorder={async (next) => { await persistOrder("site_pages", next); onChange(); }}
           renderItem={(p) => (
             <div className="flex items-center justify-between gap-3 py-1 flex-1 min-w-0">
-              <div className="min-w-0">
+              <div className="text-amber-400 [&>svg]:h-5 [&>svg]:w-5 shrink-0"><PageIcon name={p.icon} fallback={<span className="text-xs text-muted-foreground">—</span>} /></div>
+              <div className="min-w-0 flex-1">
                 <p className={`font-serif text-lg ${p.is_visible ? "" : "text-muted-foreground line-through"}`}>{p.title}</p>
-                <p className="text-xs text-muted-foreground">{p.is_system ? `/${p.slug}` : `/p/${p.slug}`}{p.subtitle ? ` · ${p.subtitle}` : ""}</p>
+                <p className="text-xs text-muted-foreground">{p.is_system ? `/${p.slug}` : `/p/${p.slug}`}{p.subtitle ? ` · ${strip(p.subtitle)}` : ""}</p>
               </div>
               <RowActions visible={p.is_visible} onToggle={() => toggle(p)} onEdit={() => setEditing(p)} onDelete={() => setToDelete(p)} deletable={!p.is_system} />
             </div>
@@ -291,25 +298,42 @@ function PagesManager({ pages, onChange }: { pages: SitePage[]; onChange: () => 
 function PageDialog({ page, count, onClose, onSaved }: { page: SitePage | null; count: number; onClose: () => void; onSaved: () => void }) {
   const [title, setTitle] = useState(page?.title ?? "");
   const [subtitle, setSubtitle] = useState(page?.subtitle ?? "");
+  const [content, setContent] = useState(page?.content ?? "");
+  const [icon, setIcon] = useState(page?.icon ?? "");
   const [visible, setVisible] = useState(page?.is_visible ?? true);
   const [saving, setSaving] = useState(false);
   async function save() {
     if (!title.trim()) { toast.error("Inserisci un nome"); return; }
+    const extra = { subtitle: cleanRich(subtitle) || null, content: cleanRich(content), icon };
     setSaving(true);
     const { error } = page
-      ? await supabase.from("site_pages").update({ title: title.trim(), subtitle: subtitle.trim() || null, is_visible: visible }).eq("id", page.id)
-      : await supabase.from("site_pages").insert({ title: title.trim(), subtitle: subtitle.trim() || null, is_visible: visible, slug: `${slugify(title) || "pagina"}-${Math.random().toString(36).slice(2, 6)}`, sort_order: count + 1 });
+      ? await supabase.from("site_pages").update({ title: title.trim(), ...extra, is_visible: visible }).eq("id", page.id)
+      : await supabase.from("site_pages").insert({ title: title.trim(), ...extra, is_visible: visible, slug: `${slugify(title) || "pagina"}-${Math.random().toString(36).slice(2, 6)}`, sort_order: count + 1 });
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Pagina salvata"); onSaved();
   }
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader><DialogTitle>{page ? "Modifica pagina" : "Nuova pagina"}</DialogTitle></DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2"><Label>Nome</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} /></div>
-          <div className="space-y-2"><Label>Sottotitolo</Label><Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} /></div>
+          <div className="space-y-2">
+            <Label>Simbolo</Label>
+            <div className="grid grid-cols-6 sm:grid-cols-9 gap-1.5">
+              <button type="button" onClick={() => setIcon("")} title="Nessuno"
+                className={`h-10 rounded-md border text-xs ${icon === "" ? "border-amber-400 bg-amber-400/15 text-amber-300" : "border-border text-muted-foreground hover:border-amber-400/50"}`}>—</button>
+              {Object.entries(PAGE_ICONS).map(([key, { label, Icon }]) => (
+                <button key={key} type="button" onClick={() => setIcon(key)} title={label} aria-label={label}
+                  className={`h-10 flex items-center justify-center rounded-md border ${icon === key ? "border-amber-400 bg-amber-400/15 text-amber-300" : "border-border text-foreground/80 hover:border-amber-400/50"}`}>
+                  <Icon className="h-5 w-5" />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-2"><Label>Sottotitolo</Label><div className="rounded-md bg-site-bg p-1"><RichEditor value={subtitle} onChange={setSubtitle} /></div></div>
+          <div className="space-y-2"><Label>Testo della pagina (es. "Chi siamo", storia, presentazione)</Label><div className="rounded-md bg-site-bg p-1"><RichEditor value={content} onChange={setContent} /></div></div>
           <div className="flex items-center gap-2"><Switch checked={visible} onCheckedChange={setVisible} id="vis-page" /><Label htmlFor="vis-page">Visibile</Label></div>
         </div>
         <DialogFooter>
@@ -514,7 +538,10 @@ function ProductsManager({ page, categories, products, loading, onChange }: { pa
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={() => setCreating(true)} size="sm"><Plus className="h-4 w-4 mr-1" /> Nuovo prodotto</Button>
+        <div className="flex flex-wrap items-end gap-3">
+          <GlobalPriceColor />
+          <Button onClick={() => setCreating(true)} size="sm"><Plus className="h-4 w-4 mr-1" /> Nuovo prodotto</Button>
+        </div>
       </div>
 
       {loading && products.length === 0 ? <p className="text-muted-foreground">Caricamento…</p>
@@ -530,7 +557,7 @@ function ProductsManager({ page, categories, products, loading, onChange }: { pa
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="flex-1 min-w-0">
                           <p className={`font-medium ${p.is_visible ? "" : "text-muted-foreground line-through"}`}>
-                            {p.name}<span className="ml-3 text-amber-700 tabular-nums">€ {formatPrice(p.price)}</span>
+                            {p.name}<span className="ml-3 text-amber-400 tabular-nums" style={{ color: p.price_color || undefined }}>€ {formatPrice(p.price)}</span>
                           </p>
                           {p.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{strip(p.description)}</p>}
                         </div>
@@ -565,6 +592,7 @@ function ProductDialog({ page, categories, products, product, defaultCategoryId,
   const [visible, setVisible] = useState(product?.is_visible ?? true);
   const [featured, setFeatured] = useState(!!product?.is_featured);
   const [imageUrl, setImageUrl] = useState(product?.image_url ?? "");
+  const [priceColor, setPriceColor] = useState(product?.price_color ?? "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -574,7 +602,7 @@ function ProductDialog({ page, categories, products, product, defaultCategoryId,
     if (n === null) { toast.error("Prezzo non valido"); return; }
     setSaving(true);
     const cat = categoryId === NONE ? null : categoryId;
-    const base = { name: name.trim(), description: cleanRich(description) || null, price: n, category_id: cat, page: cat ? null : page, is_visible: visible, is_featured: featured, image_url: imageUrl || null };
+    const base = { name: name.trim(), description: cleanRich(description) || null, price: n, category_id: cat, page: cat ? null : page, is_visible: visible, is_featured: featured, image_url: imageUrl || null, price_color: priceColor || null };
     const groupSize = products.filter((p) => (p.category_id ?? NONE) === categoryId).length;
     const moved = !product || (product.category_id ?? NONE) !== categoryId;
     const payload = moved ? { ...base, sort_order: groupSize + 1 } : base;
@@ -605,6 +633,14 @@ function ProductDialog({ page, categories, products, product, defaultCategoryId,
           <div className="space-y-2">
             <Label>Prezzo € (es. 6,50)</Label>
             <Input inputMode="decimal" value={price} placeholder="0,00" onChange={(e) => setPrice(e.target.value)} onBlur={() => { const n = parsePrice(price); if (price && n !== null) setPrice(formatPrice(n)); }} />
+          </div>
+          <div className="space-y-2">
+            <Label>Colore del prezzo (solo per questo prodotto)</Label>
+            <div className="flex items-center gap-3">
+              <input type="color" aria-label="Colore del prezzo" value={priceColor || "#d6d3d1"} onChange={(e) => setPriceColor(e.target.value)} className="h-9 w-14 cursor-pointer rounded border border-border bg-transparent" />
+              <span className="text-sm tabular-nums" style={{ color: priceColor || undefined }}>€ {price || "0,00"}</span>
+              {priceColor ? <Button variant="ghost" size="sm" onClick={() => setPriceColor("")}>Usa colore generale</Button> : <span className="text-xs text-muted-foreground">Usa il colore generale</span>}
+            </div>
           </div>
           <div className="space-y-2"><Label>Descrizione</Label><div className="rounded-md bg-site-bg p-1"><RichEditor value={description} onChange={setDescription} /></div></div>
           <div className="space-y-2">
@@ -700,7 +736,7 @@ function SearchDialog({ open, onOpenChange, pages, onJump }: { open: boolean; on
                         {mp.map((p) => (
                           <li key={p.id}>
                             <button type="button" onClick={() => onJump(itemPage(p), "products")} className="w-full text-left py-2 px-1 hover:bg-muted transition-colors">
-                              <p className="font-medium">{p.name}<span className="ml-2 text-amber-700 tabular-nums">€ {formatPrice(p.price)}</span></p>
+                              <p className="font-medium">{p.name}<span className="ml-2 text-amber-400 tabular-nums">€ {formatPrice(p.price)}</span></p>
                               <p className="text-xs text-muted-foreground">{itemPath(p)}{!p.is_visible && " · nascosto"}</p>
                             </button>
                           </li>
@@ -714,5 +750,25 @@ function SearchDialog({ open, onOpenChange, pages, onJump }: { open: boolean; on
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function GlobalPriceColor() {
+  const qc = useQueryClient();
+  const [color, setColor] = useState("");
+  useEffect(() => { getSettings().then((s) => setColor(s[PRICE_COLOR_KEY] ?? "")).catch(() => {}); }, []);
+  async function save(value: string) {
+    setColor(value);
+    try { await saveSetting(PRICE_COLOR_KEY, value); await qc.invalidateQueries({ queryKey: ["settings"] }); toast.success(value ? "Colore prezzi salvato" : "Colore prezzi predefinito ripristinato"); }
+    catch { toast.error("Salvataggio non riuscito"); }
+  }
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs tracking-widest uppercase text-muted-foreground">Colore generale prezzi</Label>
+      <div className="flex items-center gap-2">
+        <input type="color" aria-label="Colore generale dei prezzi" value={color || "#d6d3d1"} onChange={(e) => setColor(e.target.value)} onBlur={(e) => save(e.target.value)} className="h-9 w-14 cursor-pointer rounded border border-border bg-transparent" />
+        {color && <Button variant="ghost" size="sm" onClick={() => save("")}>Predefinito</Button>}
+      </div>
+    </div>
   );
 }
