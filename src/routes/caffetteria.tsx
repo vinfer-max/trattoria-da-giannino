@@ -18,7 +18,7 @@ export const Route = createFileRoute("/caffetteria")({
       page="caffetteria"
       icon={<Coffee />}
       title="Caffetteria"
-      subtitle="Caffè, cappuccino, tisane e dolci della tradizione"
+      subtitle=""
     />
   ),
 });

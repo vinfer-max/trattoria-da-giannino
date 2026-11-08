@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { getMenuPage, getPageDirectItems, type CategoryWithItems } from "@/lib/menu";
 import { getPageBySlug } from "@/lib/cms";
 import MenuSection from "./MenuSection";
+import RichText from "./RichText";
+import { PageIcon } from "@/lib/page-icons";
 
 export default function MenuPageView({
   page,
@@ -30,8 +32,9 @@ export default function MenuPageView({
   const { data: pageInfo } = useQuery({ queryKey: ["page", page], queryFn: () => getPageBySlug(page) });
   if (pageInfo) {
     title = pageInfo.title || title;
-    subtitle = pageInfo.subtitle ?? subtitle;
+    subtitle = pageInfo.subtitle ?? "";
   }
+  const pageIcon = <PageIcon name={pageInfo?.icon} fallback={icon} />;
   const all: CategoryWithItems[] = direct.length
     ? [{ id: "direct", slug: "prodotti", name: "", page, items: direct, children: [], description: "", time_range: "", cover_charge: 0, sort_order: 0, parent_id: null, is_visible: true, created_at: null } as CategoryWithItems, ...categories]
     : categories;
@@ -52,9 +55,9 @@ export default function MenuPageView({
       <section className="relative py-16 sm:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-stone-900/50 to-stone-950" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="w-10 h-10 text-amber-500 mx-auto mb-4 [&>svg]:w-10 [&>svg]:h-10">{icon}</div>
+          <div className="w-10 h-10 text-amber-500 mx-auto mb-4 [&>svg]:w-10 [&>svg]:h-10">{pageIcon}</div>
           <h1 className="text-4xl sm:text-5xl font-serif text-stone-100 mb-3">{title}</h1>
-          <p className="text-stone-400 text-lg">{subtitle}</p>
+          {subtitle && <RichText html={subtitle} className="text-stone-400 text-lg" />}
         </div>
       </section>
 
@@ -80,6 +83,7 @@ export default function MenuPageView({
         ) : (
           <>
             {note && <p className="text-sm text-stone-400 italic mb-8 text-center">{note}</p>}
+            {pageInfo?.content && <RichText html={pageInfo.content} className="text-stone-300 mb-12" />}
             <MenuSection categories={all} />
           </>
         )}

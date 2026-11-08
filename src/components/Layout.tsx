@@ -152,7 +152,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           <div className="flex flex-col items-center text-center">
             <img src={logo} alt="Trattoria da Giannino est. 1974" className="h-20 w-auto bg-site-logo p-1 object-contain mb-4" />
             <div className="font-serif text-lg text-stone-100 mb-1">Trattoria da Giannino est. 1974</div>
-            <p className="text-sm text-stone-500 mb-6">Stesse radici, nuovo orizzonte.</p>
+            <p className="text-sm text-stone-500 mb-6">Cucina, passione e tradizione siciliana dal 1974</p>
             <div className="flex flex-wrap gap-4 justify-center mb-6">
               {navLinks.map((link) => (
                 <NavLink key={link.to} to={link.to} className="text-sm text-stone-400 hover:text-amber-400 transition-colors">
