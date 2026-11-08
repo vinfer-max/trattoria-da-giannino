@@ -65,7 +65,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               <img
                 src={logo}
                 alt="Trattoria da Giannino est. 1974"
-                className="h-10 sm:h-12 w-auto bg-site-logo p-1 object-contain shrink-0"
+                className="h-10 sm:h-12 w-auto object-contain shrink-0 logo-plate"
               />
               <div className="min-w-0 leading-tight">
                 <div className="text-sm sm:text-lg font-serif font-semibold text-site-text">
@@ -122,7 +122,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         >
           <div className="p-6 pt-20">
             <div className="mb-8 flex flex-col items-center text-center">
-              <img src={logo} alt="Trattoria da Giannino est. 1974" className="h-20 w-auto bg-site-logo p-1 object-contain mb-3" />
+              <img src={logo} alt="Trattoria da Giannino est. 1974" className="h-20 w-auto object-contain mb-3 logo-plate" />
               <div className="font-serif text-lg text-stone-100">Trattoria da Giannino</div>
               <div className="text-xs tracking-[0.25em] text-amber-500/80 uppercase mt-0.5">Est. 1974</div>
             </div>
@@ -150,9 +150,9 @@ export default function Layout({ children }: { children: ReactNode }) {
       <footer className="border-t border-stone-800/60 bg-stone-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col items-center text-center">
-            <img src={logo} alt="Trattoria da Giannino est. 1974" className="h-20 w-auto bg-site-logo p-1 object-contain mb-4" />
+            <img src={logo} alt="Trattoria da Giannino est. 1974" className="h-20 w-auto object-contain mb-4 logo-plate" />
             <div className="font-serif text-lg text-stone-100 mb-1">Trattoria da Giannino est. 1974</div>
-            <p className="text-sm text-stone-500 mb-6">Stesse radici, nuovo orizzonte.</p>
+            <p className="text-sm text-stone-500 mb-6">Cucina, passione e tradizione siciliana dal 1974</p>
             <div className="flex flex-wrap gap-4 justify-center mb-6">
               {navLinks.map((link) => (
                 <NavLink key={link.to} to={link.to} className="text-sm text-stone-400 hover:text-amber-400 transition-colors">

@@ -6,9 +6,9 @@ export const Route = createFileRoute("/caffetteria")({
   head: () => ({
     meta: [
       { title: "Caffetteria — Trattoria da Giannino est. 1974" },
-      { name: "description", content: "Caffè, cappuccino, tisane e dolci della tradizione." },
+      { name: "description", content: "La storia e la cucina della Trattoria da Giannino." },
       { property: "og:title", content: "Caffetteria — Trattoria da Giannino est. 1974" },
-      { property: "og:description", content: "Caffè, cappuccino, tisane e dolci della tradizione." },
+      { property: "og:description", content: "La storia e la cucina della Trattoria da Giannino." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/caffetteria")({
       page="caffetteria"
       icon={<Coffee />}
       title="Caffetteria"
-      subtitle="Caffè, cappuccino, tisane e dolci della tradizione"
+      subtitle=""
     />
   ),
 });

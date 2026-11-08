@@ -1,6 +1,11 @@
 import RichText from "./RichText";
 import type { CategoryWithItems } from "@/lib/menu";
 import { formatPrice as fmt } from "@/lib/price";
+import { useQuery } from "@tanstack/react-query";
+import { getSettings } from "@/lib/cms";
+
+export const PRICE_COLOR_KEY = "price_color";
+const safeColor = (c?: string | null) => (c && /^#[0-9a-fA-F]{3,8}$/.test(c) ? c : undefined);
 
 function formatPrice(price: number): string {
   if (price === 0) return "";
@@ -37,7 +42,7 @@ function GeoWineDescription({ description }: { description: string }) {
   );
 }
 
-function Category({ category, depth }: { category: CategoryWithItems; depth: number }) {
+function Category({ category, depth, priceColor }: { category: CategoryWithItems; depth: number; priceColor?: string | undefined }) {
   const isWine = WINE_SLUGS.includes(category.slug);
   const showGeoPrefix = isWine && isGeoWineCategory(category.slug);
   const isCocktails = category.slug === COCKTAILS_SLUG;
@@ -94,7 +99,7 @@ function Category({ category, depth }: { category: CategoryWithItems; depth: num
                   )}
                 </div>
                 {price > 0 && (
-                  <span className={`text-base sm:text-lg font-light tabular-nums whitespace-nowrap pt-0.5 ${item.is_featured ? "text-amber-300" : "text-stone-300"}`}>
+                  <span className={`text-base sm:text-lg font-light tabular-nums whitespace-nowrap pt-0.5 ${item.is_featured ? "text-amber-300" : "text-stone-300"}`} style={{ color: safeColor(item.price_color) ?? priceColor }}>
                     {formatPrice(price)}
                   </span>
                 )}
@@ -105,17 +110,19 @@ function Category({ category, depth }: { category: CategoryWithItems; depth: num
       </ul>
 
       {category.children.map((child) => (
-        <Category key={child.id} category={child} depth={depth + 1} />
+        <Category key={child.id} category={child} depth={depth + 1} priceColor={priceColor} />
       ))}
     </section>
   );
 }
 
 export default function MenuSection({ categories }: { categories: CategoryWithItems[] }) {
+  const { data: settings } = useQuery({ queryKey: ["settings"], queryFn: getSettings });
+  const priceColor = safeColor(settings?.[PRICE_COLOR_KEY]);
   return (
     <div className="space-y-12">
       {categories.map((category) => (
-        <Category key={category.id} category={category} depth={0} />
+        <Category key={category.id} category={category} depth={0} priceColor={priceColor} />
       ))}
     </div>
   );
