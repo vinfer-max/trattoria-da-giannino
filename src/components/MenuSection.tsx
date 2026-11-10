@@ -1,4 +1,6 @@
 import RichText from "./RichText";
+import RichName from "./RichName";
+import { plainName } from "@/lib/rich-name";
 import type { CategoryWithItems } from "@/lib/menu";
 import { formatPrice as fmt } from "@/lib/price";
 import { useQuery } from "@tanstack/react-query";
@@ -52,7 +54,7 @@ function Category({ category, depth, priceColor }: { category: CategoryWithItems
     <section id={category.slug} className="scroll-mt-24">
       {category.name && <div className={`flex items-baseline justify-between border-b border-stone-700/50 ${depth === 0 ? "mb-6 pb-3" : "mb-4 pb-2 mt-6"}`}>
         <h2 className={depth === 0 ? "text-2xl sm:text-3xl font-serif text-amber-400" : "text-lg sm:text-xl font-serif text-amber-300/90"}>
-          {category.name}
+          <RichName value={category.name} />
         </h2>
         {category.time_range && <span className="text-sm text-stone-400 tracking-wide">{category.time_range}</span>}
       </div>}
@@ -86,12 +88,10 @@ function Category({ category, depth, priceColor }: { category: CategoryWithItems
                 }`}
               >
                 {item.image_url && (
-                  <img src={item.image_url} alt={item.name} className="w-16 h-16 rounded-lg object-cover shrink-0" loading="lazy" />
+                  <img src={item.image_url} alt={plainName(item.name)} className="w-16 h-16 rounded-lg object-cover shrink-0" loading="lazy" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <span className={`text-base sm:text-lg ${item.is_featured ? "text-amber-300 font-semibold" : "text-stone-200"}`}>
-                    {item.name}
-                  </span>
+                  <RichName value={item.name} className={`text-base sm:text-lg ${item.is_featured ? "text-amber-300 font-semibold" : "text-stone-200"}`} />
                   {item.description && (
                     showGeoPrefix
                       ? <GeoWineDescription description={item.description} />

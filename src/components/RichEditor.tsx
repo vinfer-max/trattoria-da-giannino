@@ -29,7 +29,7 @@ const FONTS = [
 const PALETTE = ["#f5f5f4", "#a8a29e", "#57534e", "#0c0a09", "#fbbf24", "#f59e0b", "#b45309", "#78350f", "#dc2626", "#9f1239", "#16a34a", "#2563eb"];
 const SIZES = ["", "12px", "14px", "16px", "18px", "20px", "24px", "28px", "32px", "40px", "48px", "56px", "64px", "72px"];
 
-export default function RichEditor({ value, onChange }: { value: string; onChange: (html: string) => void }) {
+export default function RichEditor({ value, onChange, ariaLabel }: { value: string; onChange: (html: string) => void; ariaLabel?: string }) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -39,7 +39,7 @@ export default function RichEditor({ value, onChange }: { value: string; onChang
     ],
     content: value,
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
-    editorProps: { attributes: { class: "rich-text min-h-[140px] p-4 focus:outline-none" } },
+    editorProps: { attributes: { class: "rich-text min-h-[140px] p-4 focus:outline-none", role: "textbox", "aria-label": ariaLabel ?? "Testo formattato", "aria-multiline": "true" } },
   });
 
   useEffect(() => {

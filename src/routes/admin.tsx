@@ -9,6 +9,8 @@ import type { MenuCategory, MenuItem } from "@/lib/menu";
 import { slugify, uploadImage, type SitePage } from "@/lib/cms";
 import { formatPrice, parsePrice } from "@/lib/price";
 import RichEditor from "@/components/RichEditor";
+import RichName from "@/components/RichName";
+import { plainName, nameEditorContent } from "@/lib/rich-name";
 import ContactsAdmin from "@/components/ContactsAdmin";
 import { HomeTab } from "@/components/HomeEventsAdmin";
 import { PAGE_ICONS, PageIcon } from "@/lib/page-icons";
@@ -370,7 +372,7 @@ function CategoriesManager({ page, categories, loading, onChange }: { page: stri
   const renderRow = (c: MenuCategory, isChild = false) => (
     <div className="flex items-center gap-3 flex-1 min-w-0">
       <div className="flex-1 min-w-0">
-        <p className={`font-medium ${c.is_visible ? "" : "text-muted-foreground line-through"}`}>{isChild && <span className="text-muted-foreground">↳ </span>}{c.name}</p>
+        <div className={`flex items-start gap-1 font-medium ${c.is_visible ? "" : "text-muted-foreground line-through"}`}>{isChild && <span className="text-muted-foreground">↳</span>}<RichName value={c.name} /></div>
         {(c.time_range || c.cover_charge) && <p className="text-xs text-muted-foreground">{c.time_range}{c.cover_charge ? ` · Coperto € ${formatPrice(c.cover_charge)}` : ""}</p>}
       </div>
       <RowActions visible={c.is_visible} onToggle={() => toggle(c)} onEdit={() => setEditing(c)} onDelete={() => setToDelete(c)} />
@@ -412,7 +414,7 @@ function CategoriesManager({ page, categories, loading, onChange }: { page: stri
 }
 
 function CategoryDialog({ page, categories, category, onClose, onSaved }: { page: string; categories: MenuCategory[]; category: MenuCategory | null; onClose: () => void; onSaved: () => void }) {
-  const [name, setName] = useState(category?.name ?? "");
+  const [name, setName] = useState(nameEditorContent(category?.name ?? ""));
   const [description, setDescription] = useState(category?.description ?? "");
   const [timeRange, setTimeRange] = useState(category?.time_range ?? "");
   const [cover, setCover] = useState(category?.cover_charge ? formatPrice(category.cover_charge) : "");
@@ -432,16 +434,16 @@ function CategoryDialog({ page, categories, category, onClose, onSaved }: { page
   const possibleParents = categories.filter((c) => !blocked.has(c.id));
 
   async function save() {
-    if (!name.trim()) { toast.error("Nome obbligatorio"); return; }
+    if (!plainName(name)) { toast.error("Nome obbligatorio"); return; }
     const coverN = cover.trim() ? parsePrice(cover) : 0;
     if (coverN === null) { toast.error("Coperto non valido"); return; }
     setSaving(true);
     const parent = parentId === NONE ? null : parentId;
-    const base = { name: name.trim(), description: cleanRich(description), time_range: timeRange.trim() || null, cover_charge: coverN || null, parent_id: parent, is_visible: visible };
+    const base = { name: cleanRich(name), description: cleanRich(description), time_range: timeRange.trim() || null, cover_charge: coverN || null, parent_id: parent, is_visible: visible };
     const siblings = categories.filter((c) => c.parent_id === parent);
     const { error } = category
       ? await supabase.from("menu_categories").update(category.parent_id === parent ? base : { ...base, sort_order: siblings.length + 1 }).eq("id", category.id)
-      : await supabase.from("menu_categories").insert({ ...base, page, slug: `${slugify(name) || "cat"}-${Date.now().toString(36)}`, sort_order: siblings.length + 1 });
+      : await supabase.from("menu_categories").insert({ ...base, page, slug: `${slugify(plainName(name)) || "cat"}-${Date.now().toString(36)}`, sort_order: siblings.length + 1 });
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     toast.success(category ? "Categoria aggiornata" : "Categoria creata"); onSaved();
@@ -452,7 +454,7 @@ function CategoryDialog({ page, categories, category, onClose, onSaved }: { page
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>{category ? "Modifica categoria" : "Nuova categoria"}</DialogTitle></DialogHeader>
         <div className="space-y-4">
-          <div className="space-y-2"><Label>Nome *</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
+          <div className="space-y-2"><Label>Nome *</Label><RichEditor value={name} onChange={setName} ariaLabel="Nome" /></div>
           <div className="space-y-2">
             <Label>Sotto-categoria di</Label>
             <Select value={parentId} onValueChange={setParentId}>
@@ -480,11 +482,11 @@ function CategoryDialog({ page, categories, category, onClose, onSaved }: { page
 }
 
 function catPath(c: MenuCategory, all: MenuCategory[]): string {
-  const parts = [c.name];
+  const parts = [plainName(c.name)];
   let cur = c;
   for (let i = 0; i < 5 && cur.parent_id; i++) {
     const p = all.find((x) => x.id === cur.parent_id); if (!p) break;
-    parts.unshift(p.name); cur = p;
+    parts.unshift(plainName(p.name)); cur = p;
   }
   return parts.join(" › ");
 }
@@ -556,9 +558,9 @@ function ProductsManager({ page, categories, products, loading, onChange }: { pa
                     renderItem={(p) => (
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="flex-1 min-w-0">
-                          <p className={`font-medium ${p.is_visible ? "" : "text-muted-foreground line-through"}`}>
-                            {p.name}<span className="ml-3 text-amber-400 tabular-nums" style={{ color: p.price_color || undefined }}>€ {formatPrice(p.price)}</span>
-                          </p>
+                          <div className={`flex flex-wrap items-baseline gap-2 font-medium ${p.is_visible ? "" : "text-muted-foreground line-through"}`}>
+                            <RichName value={p.name} /><span className="ml-3 text-amber-400 tabular-nums" style={{ color: p.price_color || undefined }}>€ {formatPrice(p.price)}</span>
+                          </div>
                           {p.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{strip(p.description)}</p>}
                         </div>
                         <RowActions visible={p.is_visible} onToggle={() => patch(p, { is_visible: !p.is_visible })} onEdit={() => setEditing(p)} onDelete={() => setToDelete(p)} />
@@ -585,7 +587,7 @@ function ProductsManager({ page, categories, products, loading, onChange }: { pa
 function ProductDialog({ page, categories, products, product, defaultCategoryId, onClose, onSaved }: {
   page: string; categories: MenuCategory[]; products: MenuItem[]; product: MenuItem | null; defaultCategoryId: string; onClose: () => void; onSaved: () => void;
 }) {
-  const [name, setName] = useState(product?.name ?? "");
+  const [name, setName] = useState(nameEditorContent(product?.name ?? ""));
   const [description, setDescription] = useState(product?.description ?? "");
   const [price, setPrice] = useState(product ? formatPrice(product.price) : "");
   const [categoryId, setCategoryId] = useState(product ? (product.category_id ?? NONE) : defaultCategoryId);
@@ -597,12 +599,12 @@ function ProductDialog({ page, categories, products, product, defaultCategoryId,
   const [saving, setSaving] = useState(false);
 
   async function save() {
-    if (!name.trim()) { toast.error("Nome obbligatorio"); return; }
+    if (!plainName(name)) { toast.error("Nome obbligatorio"); return; }
     const n = price.trim() ? parsePrice(price) : 0;
     if (n === null) { toast.error("Prezzo non valido"); return; }
     setSaving(true);
     const cat = categoryId === NONE ? null : categoryId;
-    const base = { name: name.trim(), description: cleanRich(description) || null, price: n, category_id: cat, page: cat ? null : page, is_visible: visible, is_featured: featured, image_url: imageUrl || null, price_color: priceColor || null };
+    const base = { name: cleanRich(name), description: cleanRich(description) || null, price: n, category_id: cat, page: cat ? null : page, is_visible: visible, is_featured: featured, image_url: imageUrl || null, price_color: priceColor || null };
     const groupSize = products.filter((p) => (p.category_id ?? NONE) === categoryId).length;
     const moved = !product || (product.category_id ?? NONE) !== categoryId;
     const payload = moved ? { ...base, sort_order: groupSize + 1 } : base;
@@ -619,7 +621,7 @@ function ProductDialog({ page, categories, products, product, defaultCategoryId,
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>{product ? "Modifica prodotto" : "Nuovo prodotto"}</DialogTitle></DialogHeader>
         <div className="space-y-4">
-          <div className="space-y-2"><Label>Nome *</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
+          <div className="space-y-2"><Label>Nome *</Label><RichEditor value={name} onChange={setName} ariaLabel="Nome" /></div>
           <div className="space-y-2">
             <Label>Categoria</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
@@ -691,8 +693,8 @@ function SearchDialog({ open, onOpenChange, pages, onJump }: { open: boolean; on
 
   const q = query.trim().toLowerCase();
   const pageTitle = (slug: string) => pages.find((p) => p.slug === slug)?.title ?? slug;
-  const mc = q ? cats.filter((c) => c.name.toLowerCase().includes(q)) : [];
-  const mp = q ? items.filter((p) => p.name.toLowerCase().includes(q)) : [];
+  const mc = q ? cats.filter((c) => plainName(c.name).toLowerCase().includes(q)) : [];
+  const mp = q ? items.filter((p) => plainName(p.name).toLowerCase().includes(q)) : [];
   const itemPage = (p: MenuItem) => (p.category_id ? cats.find((c) => c.id === p.category_id)?.page : p.page) ?? "";
   const itemPath = (p: MenuItem) => {
     const c = p.category_id ? cats.find((x) => x.id === p.category_id) : null;
@@ -721,7 +723,7 @@ function SearchDialog({ open, onOpenChange, pages, onJump }: { open: boolean; on
                         {mc.map((c) => (
                           <li key={c.id}>
                             <button type="button" onClick={() => onJump(c.page, "categories")} className="w-full text-left py-2 px-1 hover:bg-muted transition-colors">
-                              <p className="font-medium">{c.name}</p>
+                              <RichName value={c.name} className="font-medium" />
                               <p className="text-xs text-muted-foreground">{pageTitle(c.page)} › {catPath(c, cats)}{!c.is_visible && " · nascosta"}</p>
                             </button>
                           </li>
@@ -736,7 +738,7 @@ function SearchDialog({ open, onOpenChange, pages, onJump }: { open: boolean; on
                         {mp.map((p) => (
                           <li key={p.id}>
                             <button type="button" onClick={() => onJump(itemPage(p), "products")} className="w-full text-left py-2 px-1 hover:bg-muted transition-colors">
-                              <p className="font-medium">{p.name}<span className="ml-2 text-amber-400 tabular-nums">€ {formatPrice(p.price)}</span></p>
+                              <div className="flex flex-wrap items-baseline gap-2 font-medium"><RichName value={p.name} /><span className="ml-2 text-amber-400 tabular-nums">€ {formatPrice(p.price)}</span></div>
                               <p className="text-xs text-muted-foreground">{itemPath(p)}{!p.is_visible && " · nascosto"}</p>
                             </button>
                           </li>
