@@ -9,7 +9,7 @@ export const Route = createFileRoute("/contatti")({
   head: () => ({
     meta: [
       { title: "Contatti — Trattoria da Giannino est. 1974" },
-      { name: "description", content: "Via Nazionale 34, Santo Stefano di Camastra (ME). Tel. 0921 995719." },
+      { name: "description", content: "Via Garibaldi 14, Santo Stefano di Camastra (ME). Tel. 0921 331748." },
       { property: "og:title", content: "Contatti — Trattoria da Giannino est. 1974" },
       { property: "og:description", content: "Vieni a trovarci a Santo Stefano di Camastra." },
       { property: "og:type", content: "website" },

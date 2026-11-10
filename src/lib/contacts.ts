@@ -1,12 +1,12 @@
 export const CONTACTS_KEY = "contact_details";
 
 export const defaultContacts = {
-  address: "<p>Via Nazionale, 34<br>98077 Santo Stefano di Camastra (ME)</p>",
-  phone: "0921 995719",
-  email: "gianninobistrotcafe@gmail.com",
-  instagram: "giannino.bistrot",
-  hours: "<p>Lunedì – Domenica</p><p>Giovedì chiuso</p>",
-  mapAddress: "Via Nazionale 34, 98077 Santo Stefano di Camastra ME",
+  address: "<p>Via Garibaldi, 14<br>98077 Santo Stefano di Camastra (ME)</p>",
+  phone: "0921 331748",
+  email: "trattoriadagiannino1974@gmail.com",
+  instagram: "trattoriadagiannino1974",
+  hours: "<p>Lun - Sab: 12:30 - 14:30 | 19:30 - 21:30</p><p>Dom: 12:30 - 14:30</p><p>Chiuso il Giovedì </p>",
+  mapAddress: "Via Garibaldi, 14 98077 Santo Stefano di Camastra (ME)",
   addressVisible: true,
   phoneVisible: true,
   emailVisible: true,
