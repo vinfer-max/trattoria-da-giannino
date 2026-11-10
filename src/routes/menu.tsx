@@ -6,7 +6,7 @@ export const Route = createFileRoute("/menu")({
   head: () => ({
     meta: [
       { title: "Menù — Trattoria da Giannino est. 1974" },
-      { name: "description", content: "La proposta culinaria di Trattoria da Giannino est. 1974: colazione, brunch, pranzo e aperitivi." },
+      { name: "description", content: "Il menù della Trattoria da Giannino est. 1974: cucina e tradizione siciliana." },
       { property: "og:title", content: "Menù — Trattoria da Giannino est. 1974" },
       { property: "og:description", content: "La nostra proposta culinaria." },
       { property: "og:type", content: "website" },

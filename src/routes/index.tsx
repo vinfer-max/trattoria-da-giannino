@@ -2,19 +2,16 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, CalendarDays } from "lucide-react";
-import heroAsset from "@/assets/hero-sala.jpg.asset.json";
 import { getHomeData } from "@/lib/cms";
 import RichText from "@/components/RichText";
-
-const fallbackHero = heroAsset.url;
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Trattoria da Giannino est. 1974" },
-      { name: "description", content: "Stesse radici, nuovo orizzonte. Colazione, brunch, pranzo, lounge e aperitivi a Santo Stefano di Camastra." },
+      { name: "description", content: "Trattoria da Giannino est. 1974: cucina, passione e tradizione siciliana a Santo Stefano di Camastra." },
       { property: "og:title", content: "Trattoria da Giannino est. 1974" },
-      { property: "og:description", content: "Stesse radici, nuovo orizzonte. Accanto alla tradizione, nasce un nuovo gusto." },
+      { property: "og:description", content: "Cucina, passione e tradizione siciliana dal 1974 a Santo Stefano di Camastra." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -25,7 +22,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { data } = useQuery({ queryKey: ["home"], queryFn: getHomeData });
   const s = data?.settings ?? {};
-  const images = data && data.slides.length ? data.slides.map((x) => x.image_url) : [fallbackHero];
+  const images = data?.slides.map((x) => x.image_url) ?? [];
   const carousel = s['home_carousel_enabled'] === "true" && images.length > 1;
   const interval = Math.max(2, Number(s['home_carousel_interval']) || 5) * 1000;
   const [idx, setIdx] = useState(0);
@@ -53,10 +50,10 @@ function Home() {
             <RichText html={s['home_title']} className="text-4xl sm:text-6xl md:text-7xl font-serif text-stone-50 leading-[1.1] mb-6" />
           ) : (
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif text-stone-50 leading-[1.1] mb-6">
-              Stesse radici,<br /><em className="text-amber-400">nuovo orizzonte.</em>
+              Trattoria da Giannino<br /><em className="text-site-accent">est. 1974</em>
             </h1>
           )}
-          <RichText html={s['home_subtitle'] ?? "Accanto alla tradizione, nasce un nuovo gusto."} className="text-lg sm:text-xl text-stone-300 font-light max-w-2xl mx-auto mb-10" />
+          <RichText html={s['home_subtitle'] ?? "Cucina, passione e tradizione siciliana dal 1974"} className="text-lg sm:text-xl text-stone-300 font-light max-w-2xl mx-auto mb-10" />
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/menu" className="inline-flex items-center justify-center px-8 py-3.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-sm tracking-wide rounded-lg">
               Scopri il Menù

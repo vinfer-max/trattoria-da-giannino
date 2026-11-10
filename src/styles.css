@@ -180,7 +180,7 @@ html { scroll-behavior: smooth; }
 ::-webkit-scrollbar-track { background: #0c0a09; }
 ::-webkit-scrollbar-thumb { background: #292524; border-radius: 3px; }
 
-/* Bistro sign plate around the logo: dark forest frame, thin gold rule, cream inner panel. */
+/* Restaurant sign plate around the logo: dark forest frame, thin gold rule, cream inner panel. */
 .logo-plate {
   background-color: var(--color-site-logo);
   padding: 3px;
