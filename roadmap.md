@@ -1,4 +1,5 @@
 # Tasks
+- [ ] Remove old bistrot photos, descriptions and references from public pages and saved content.
 - [x] Add rich editors to product, category and subcategory names; verified authenticated product creation, formatting save, public readback, cleanup, and desktop/mobile editors.
 - [ ] Keep the wine index sticky with compact wrapped links and verify anchors on desktop and mobile.
 - [x] Replace old displayed restaurant branding and protect rectangular logo corners; verified public pages and desktop/mobile logo display.
