@@ -5,6 +5,7 @@ import { getMenuPage, getPageDirectItems, type CategoryWithItems } from "@/lib/m
 import { getPageBySlug } from "@/lib/cms";
 import MenuSection from "./MenuSection";
 import RichText from "./RichText";
+import { plainName } from "@/lib/rich-name";
 import { PageIcon } from "@/lib/page-icons";
 
 export default function MenuPageView({
@@ -69,7 +70,7 @@ export default function MenuPageView({
               <a
                 href={`#${cat.slug}`}
               >
-                {cat.name}
+                {plainName(cat.name)}
               </a>
               </Button>
             ))}
