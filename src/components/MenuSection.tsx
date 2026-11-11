@@ -38,7 +38,7 @@ function GeoWineDescription({ description }: { description: string }) {
   return (
     <span className="block text-sm mt-0.5 text-stone-500 italic">
       <strong className="font-bold text-amber-400 not-italic">{description.slice(0, idx)}</strong>
-      <span>{" — "}</span>
+      <span>{" - "}</span>
       <span>{description.slice(idx + 3)}</span>
     </span>
   );
